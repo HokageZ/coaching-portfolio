@@ -1,5 +1,5 @@
-import { useRef, useMemo, useState, useEffect } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useMemo, useState, useEffect, memo } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 /**
@@ -13,7 +13,7 @@ import { useLanguage } from '../../context/LanguageContext';
  * @param {string} props.highlightedText - Text in the title to be highlighted with gradient
  * @param {React.ReactNode} props.children - The section content
  */
-const SectionAnimator = ({ 
+const SectionAnimator = memo(({ 
   id, 
   title, 
   subtitle, 
@@ -29,23 +29,31 @@ const SectionAnimator = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const { dir } = useLanguage();
   
+  // More efficient InView detection with lower sensitivity
   const isInView = useInView(sectionRef, { 
     once: true, 
-    margin: "-10% 0px",
-    amount: 0.1 
+    margin: "-5% 0px",
+    amount: 0.05,
+    fallback: true // Ensure element is considered in view if detection fails
   });
   
-  // Handle loading state
+  // Simplified loading state management
   useEffect(() => {
-    if (isInView) {
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (isInView && !isLoaded) {
+      setIsLoaded(true);
     }
-  }, [isInView]);
+    
+    // Fallback timer with longer delay to reduce unnecessary state changes
+    const timer = setTimeout(() => {
+      if (!isLoaded) {
+        setIsLoaded(true);
+      }
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, [isInView, isLoaded]);
   
-  // Minimal title formatting logic
+  // Minimal title formatting logic with memoization
   const formattedTitle = useMemo(() => {
     if (!highlightedText || !title) return title;
     
@@ -61,29 +69,42 @@ const SectionAnimator = ({
     );
   }, [title, highlightedText]);
 
+  // Only log in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`Section ${id} - isInView: ${isInView}, isLoaded: ${isLoaded}`);
+  }
+
+  // Memoize animation controls for better performance
+  const titleAnimation = useMemo(() => ({
+    opacity: isInView || isLoaded ? 1 : 0,
+    y: isInView || isLoaded ? 0 : 15
+  }), [isInView, isLoaded]);
+
+  const contentAnimation = useMemo(() => ({
+    opacity: isLoaded || isInView ? 1 : 0,
+    y: isLoaded || isInView ? 0 : 20
+  }), [isInView, isLoaded]);
+
   return (
     <section 
       id={id} 
       ref={sectionRef}
       className={`py-16 md:py-24 relative overflow-hidden ${className}`}
     >
-      {/* Background element */}
+      {/* Background element - only render if needed */}
       {backgroundClassName && (
         <div className={`absolute inset-0 -z-10 ${backgroundClassName}`} />
       )}
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto">
-          {/* Section header with minimal animations */}
+          {/* Section header with minimal animations - only render if needed */}
           {showTitle && title && (
             <div className="text-center mb-12 md:mb-16">
               <motion.h2 
                 className={`text-3xl md:text-4xl font-bold mb-4 ${titleClassName}`}
                 initial={{ opacity: 0, y: 15 }}
-                animate={{ 
-                  opacity: isInView ? 1 : 0, 
-                  y: isInView ? 0 : 15 
-                }}
+                animate={titleAnimation}
                 transition={{ duration: 0.5, ease: "easeOut" }}
               >
                 {formattedTitle}
@@ -93,8 +114,8 @@ const SectionAnimator = ({
                 <motion.p 
                   className={`text-gray-300 text-lg max-w-2xl mx-auto ${subtitleClassName}`}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: isInView ? 1 : 0 }}
-                  transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+                  animate={{ opacity: titleAnimation.opacity }}
+                  transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   {subtitle}
                 </motion.p>
@@ -103,34 +124,35 @@ const SectionAnimator = ({
               <motion.div 
                 className="w-24 h-1 bg-primary/30 rounded-full mx-auto mt-6"
                 initial={{ width: 0 }}
-                animate={{ width: isInView ? '6rem' : 0 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+                animate={{ width: isInView || isLoaded ? '6rem' : 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
               />
             </div>
           )}
           
-          {/* Section content with single animation */}
-          <AnimatePresence>
-            {isLoaded && (
-              <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1,
-                  y: 0
-                }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-                style={{ direction: dir }}
-                className={dir === 'rtl' ? 'rtl' : ''}
-              >
-                {children}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Main content with optimized animation */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={contentAnimation}
+            transition={{ 
+              duration: 0.4, 
+              ease: "easeOut",
+              // Use optimized hardware acceleration
+              willChange: "opacity, transform"
+            }}
+            style={{ 
+              direction: dir,
+              // Force hardware acceleration
+              transform: 'translateZ(0)'
+            }}
+            className={dir === 'rtl' ? 'rtl' : ''}
+          >
+            {children}
+          </motion.div>
         </div>
       </div>
     </section>
   );
-};
+});
 
 export default SectionAnimator; 
