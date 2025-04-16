@@ -109,48 +109,14 @@ const FAQContent = memo(({ faqs, hasAnimated }) => {
 
 // Optimized language-specific FAQ data
 const getLocalizedFaqs = (language, t) => {
-  if (language === 'en') {
-    return [
-      { question: t('faq.q1'), answer: t('faq.a1') },
-      { question: t('faq.q2'), answer: t('faq.a2') },
-      { question: t('faq.q3'), answer: t('faq.a3') },
-      { question: t('faq.q4'), answer: t('faq.a4') },
-      { question: t('faq.q5'), answer: t('faq.a5') },
-      { question: t('faq.q6'), answer: t('faq.a6') },
-      { question: t('faq.q7'), answer: t('faq.a7') }
-    ];
-  } 
-  
-  // For Arabic, use the original Arabic questions and answers
   return [
-    {
-      question: 'مين يقدر ينضم للبرنامج؟',
-      answer: 'اي حد حابب يوصل لهدفك ويخلي حياتك افضل'
-    },
-    {
-      question: 'هل بتمرن بنات؟',
-      answer: 'ايوا بس المتابعه بدون صور ولو حبيتي ممكن يبقي التواصل من خلال الوالد او الأخ'
-    },
-    {
-      question: 'بستلم البرنامج فى قد اية؟',
-      answer: 'من يوم ل ٣ أيام كحد اقصي'
-    },
-    {
-      question: 'إيه سياسة الاسترجاع؟',
-      answer: 'يمكنك استرداد كامل مبلغ الاشتراك اذا لم يتم استلام اى خطط , لاكن اذا تم استلام البرنامج لا يسمح باسترداد المبلغ'
-    },
-    {
-      question: 'هل يوجد متابعة و فحوصات؟',
-      answer: 'طبعا في الباقه الفضيه بتابعك كل أسبوع وفالباقه الذهبيه متابعه يوميه'
-    },
-    {
-      question: 'الاشتراك بيبدأ امتى؟',
-      answer: 'اول ما يوصلك جداول الشغل'
-    },
-    {
-      question: 'هل لازم أنشر تحول العميل؟',
-      answer: 'يفضل بس لو العميل مش حابب فا دي خصوصيه وأنا مقدرش أتعداها'
-    }
+    { question: t('faq.q1'), answer: t('faq.a1') },
+    { question: t('faq.q2'), answer: t('faq.a2') },
+    { question: t('faq.q3'), answer: t('faq.a3') },
+    { question: t('faq.q4'), answer: t('faq.a4') },
+    { question: t('faq.q5'), answer: t('faq.a5') },
+    { question: t('faq.q6'), answer: t('faq.a6') },
+    { question: t('faq.q7'), answer: t('faq.a7') }
   ];
 };
 

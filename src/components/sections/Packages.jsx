@@ -187,11 +187,18 @@ const PackageCard = ({ pkg, index, selectedPackage, setSelectedPackage }) => {
                   <div className="text-right flex flex-col items-end">
                     <div className="flex items-center">
                       <span className="text-sm text-white/60 line-through mr-2">{parseInt(tier.price) * 2}</span>
+                      <span className="text-sm text-white/60 line-through mr-2">(${parseInt(tier.priceUSD) * 2})</span>
                       <span className="text-xs px-1.5 py-0.5 bg-primary/80 text-white rounded-sm -mt-3 font-medium">{t('packages.discount')}</span>
                     </div>
-                    <div className="flex items-baseline">
-                      <span className="text-2xl font-bold text-white">{tier.price}</span>
-                      <span className="text-sm ml-1 text-white/60">{t('packages.egp')}</span>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-baseline">
+                        <span className="text-2xl font-bold text-white">{tier.price}</span>
+                        <span className="text-sm ml-1 text-white/60">{t('packages.egp')}</span>
+                      </div>
+                      <div className="flex items-baseline mt-1">
+                        <span className="text-lg font-bold text-white/90">${tier.priceUSD}</span>
+                        <span className="text-sm ml-1 text-white/60">{t('packages.usd')}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -248,6 +255,7 @@ const Packages = () => {
         {
           name: t('packages.silver'),
           price: "350",
+          priceUSD: "7",
           benefits: [
             t('packages.silver.benefit.1'),
             t('packages.silver.benefit.2')
@@ -256,6 +264,7 @@ const Packages = () => {
         {
           name: t('packages.gold'),
           price: "600",
+          priceUSD: "12",
           benefits: [
             t('packages.gold.benefit.1'),
             t('packages.gold.benefit.2'),
@@ -270,7 +279,9 @@ const Packages = () => {
         t('packages.feature.4'),
         t('packages.feature.5'),
         t('packages.feature.6'),
-        t('packages.feature.7')
+        t('packages.feature.7'),
+        t('packages.feature.8'),
+        t('packages.feature.9')
       ],
       suitableFor: t('packages.testing.suitableFor'),
       highlighted: false
@@ -282,6 +293,7 @@ const Packages = () => {
         {
           name: t('packages.silver'),
           price: "700",
+          priceUSD: "14",
           benefits: [
             t('packages.silver.benefit.1'),
             t('packages.silver.benefit.2')
@@ -290,6 +302,7 @@ const Packages = () => {
         {
           name: t('packages.gold'),
           price: "1000",
+          priceUSD: "20",
           benefits: [
             t('packages.gold.benefit.1'),
             t('packages.gold.benefit.2'),
@@ -304,7 +317,9 @@ const Packages = () => {
         t('packages.feature.4'),
         t('packages.feature.5'),
         t('packages.feature.6'),
-        t('packages.feature.7')
+        t('packages.feature.7'),
+        t('packages.feature.8'),
+        t('packages.feature.9')
       ],
       suitableFor: t('packages.development.suitableFor'),
       highlighted: true
@@ -316,6 +331,7 @@ const Packages = () => {
         {
           name: t('packages.silver'),
           price: "1100",
+          priceUSD: "22",
           benefits: [
             t('packages.silver.benefit.1'),
             t('packages.silver.benefit.2')
@@ -324,6 +340,7 @@ const Packages = () => {
         {
           name: t('packages.gold'),
           price: "1500",
+          priceUSD: "30",
           benefits: [
             t('packages.gold.benefit.1'),
             t('packages.gold.benefit.2'),
@@ -338,7 +355,9 @@ const Packages = () => {
         t('packages.feature.4'),
         t('packages.feature.5'),
         t('packages.feature.6'),
-        t('packages.feature.7')
+        t('packages.feature.7'),
+        t('packages.feature.8'),
+        t('packages.feature.9')
       ],
       suitableFor: t('packages.journey.suitableFor'),
       highlighted: false
@@ -401,9 +420,6 @@ const Packages = () => {
           transition={{ duration: 0.5, delay: 0.6 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <p className="text-gray-400 mb-4">
-            {t('packages.free_consultation')}
-          </p>
           <motion.a
             href={`https://wa.me/201099488562?text=${encodeURIComponent(t('whatsapp.general'))}`}
             target="_blank"

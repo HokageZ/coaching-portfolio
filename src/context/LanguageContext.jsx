@@ -51,8 +51,8 @@ export const LanguageProvider = ({ children }) => {
         // Restore scroll position
         window.scrollTo(0, scrollPosition);
         setIsChangingLanguage(false);
-      }, 300);
-    }, 200);
+      }, 100);
+    }, 100);
   };
 
   // Set document direction based on language

@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-import heroBackground from '../../assets/videos/hero-background.mov';
+import heroBackground from '../../assets/videos/hero-background.mp4';
 
 const Landing = () => {
   const bgVideoRef = useRef(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const { t } = useLanguage();
 
   // Animation variants
@@ -39,45 +40,75 @@ const Landing = () => {
     if (bgVideoRef.current) {
       const playVideo = async () => {
         try {
+          // Set a timeout to handle cases where video fails to load
+          const timeoutId = setTimeout(() => {
+            if (!videoLoaded) {
+              console.warn("Video loading timeout - switching to fallback");
+              setVideoError(true);
+            }
+          }, 5000);
+
+          // Ensure video is ready to play
+          if (bgVideoRef.current.readyState < 3) {
+            await new Promise((resolve) => {
+              bgVideoRef.current.addEventListener('canplaythrough', resolve, { once: true });
+            });
+          }
+
           bgVideoRef.current.playbackRate = 1.15;
           await bgVideoRef.current.play();
+          clearTimeout(timeoutId);
           console.log("Background video started playing at 1.15x speed");
         } catch (error) {
           console.error("Background video autoplay failed:", error);
+          setVideoError(true);
         }
       };
-      playVideo();
+
+      if (videoLoaded) {
+        playVideo();
+      }
     }
   }, [videoLoaded]);
+
+  const handleVideoError = (e) => {
+    console.error("Video error:", e);
+    setVideoError(true);
+  };
+
+  const handleVideoLoad = () => {
+    setVideoLoaded(true);
+    console.log("Video loaded successfully");
+  };
 
   return (
     <section id="home" className="relative min-h-screen w-full bg-background overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 w-full h-full z-0">
-        <video
-          ref={bgVideoRef}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          onLoadedData={() => {
-            setVideoLoaded(true);
-            console.log("Video loaded");
-          }}
-          onError={(e) => {
-            console.error("Video error:", e);
-          }}
-          className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000"
-          style={{ 
-            filter: 'brightness(0.6) contrast(1.1) sepia(0.3) hue-rotate(-30deg)',
-            opacity: videoLoaded ? 0.8 : 0
-          }}
-        >
-          <source src={heroBackground} type="video/quicktime" />
-          <source src={heroBackground} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        {!videoError ? (
+          <video
+            ref={bgVideoRef}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onLoadedData={handleVideoLoad}
+            onError={handleVideoError}
+            className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000"
+            style={{ 
+              filter: 'brightness(0.6) contrast(1.1) sepia(0.3) hue-rotate(-30deg)',
+              opacity: videoLoaded ? 1 : 0,
+              transform: 'scale(1.1)', // Slightly zoom to prevent edges
+              objectPosition: 'center'
+            }}
+          >
+            <source src={heroBackground} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-background/50 to-background/30" />
+        )}
       </div>
 
       {/* Background gradient overlay */}
@@ -126,7 +157,7 @@ const Landing = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.4 }}
             >
-              {t('landing.title.your')} <span className="text-primary">{t('landing.title.limits')}</span>
+              <span className="text-primary">{t('landing.title.your')}</span> {t('landing.title.limits')}
             </motion.span>
           </motion.h1>
           
@@ -147,7 +178,7 @@ const Landing = () => {
           >
             <motion.a
               href="#footer"
-              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
               whileHover={{ scale: 1.05, backgroundColor: "#950B0B" }}
               whileTap={{ scale: 0.98 }}
               onClick={(e) => {
@@ -158,7 +189,7 @@ const Landing = () => {
                 }
               }}
             >
-              <span>{t('contact.title')}</span>
+              <span className="font-bold tracking-wide">{t('nav.contact')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
@@ -166,11 +197,11 @@ const Landing = () => {
             
             <motion.a
               href="#services"
-              className="w-full sm:w-auto bg-transparent text-white border border-white/30 hover:border-white/50 text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-transparent text-white border-2 border-white/30 hover:border-white/50 text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
               whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.8)" }}
               whileTap={{ scale: 0.98 }}
             >
-              <span>{t('services.title')}</span>
+              <span className="font-bold tracking-wide">{t('services.title')}</span>
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -190,7 +221,7 @@ const Landing = () => {
               <div className="relative w-full pt-[56.25%]">
                 <iframe
                   className="absolute top-0 left-0 w-full h-full"
-                  src="https://www.youtube.com/embed/-hRWRStr31E?controls=1&modestbranding=1&showinfo=0&rel=0"
+                  src="https://www.youtube.com/embed/3hIJBqjWYxQ?controls=1&modestbranding=1&showinfo=0&rel=0&t=0"
                   title="Transformation Stories"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

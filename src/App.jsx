@@ -1,18 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useEffect, createContext, useState, useCallback, useContext, useMemo, memo } from 'react';
-import NavBar from './components/layout/NavBar';
-import Landing from './components/sections/Landing';
-import Services from './components/sections/Services';
-import Transformations from './components/sections/Transformations';
-import Feedback from './components/sections/Feedback';
-import Packages from './components/sections/Packages';
-import FAQ from './components/sections/FAQ';
-import About from './components/sections/About';
-import Footer from './components/layout/Footer';
-import NotFound from './components/ui/NotFound';
-import FontPreload from './components/ui/FontPreload';
+import { BrowserRouter as Router, Routes, Route, createRoutesFromElements } from 'react-router-dom';
+import { useEffect, createContext, useState, useCallback, useContext, useMemo, memo, Suspense, lazy } from 'react';
 import { useLanguage } from './context/LanguageContext';
-import ScrollToTop from './components/ui/ScrollToTop';
+import { CardSkeleton } from './components/ui/Skeleton';
+import ErrorBoundary from './components/ui/ErrorBoundary';
+
+// Lazy load layout components
+const NavBar = lazy(() => import('./components/layout/NavBar'));
+const Footer = lazy(() => import('./components/layout/Footer'));
+
+// Lazy load UI components
+const NotFound = lazy(() => import('./components/ui/NotFound'));
+const FontPreload = lazy(() => import('./components/ui/FontPreload'));
+const ScrollToTop = lazy(() => import('./components/ui/ScrollToTop'));
+
+// Lazy load all sections
+const Landing = lazy(() => import('./components/sections/Landing'));
+const Services = lazy(() => import('./components/sections/Services'));
+const Transformations = lazy(() => import('./components/sections/Transformations'));
+const Feedback = lazy(() => import('./components/sections/Feedback'));
+const Packages = lazy(() => import('./components/sections/Packages'));
+const FAQ = lazy(() => import('./components/sections/FAQ'));
+const About = lazy(() => import('./components/sections/About'));
 
 // Create a context for scroll animation with improved performance
 export const ScrollContext = createContext({
@@ -65,14 +73,18 @@ const useSectionVisibilityObserver = (sectionId, setVisibleSection) => {
   }, [sectionId, setVisibleSection]);
 };
 
-// Memoized section wrapper
-const SectionAnimator = memo(({ id, children }) => {
+// Memoized section wrapper with skeleton loading and error boundary
+const SectionWrapper = memo(({ id, children, fallbackMessage }) => {
   const { setVisibleSection } = useContext(ScrollContext);
   useSectionVisibilityObserver(id, setVisibleSection);
   
   return (
     <section id={id} className="relative">
-      {children}
+      <ErrorBoundary fallbackMessage={fallbackMessage}>
+        <Suspense fallback={<CardSkeleton />}>
+          {children}
+        </Suspense>
+      </ErrorBoundary>
     </section>
   );
 });
@@ -120,39 +132,61 @@ const Home = () => {
   return (
     <div className={`${isChangingLanguage ? 'overflow-hidden' : ''}`}>
       <ScrollContext.Provider value={contextValue}>
-        <FontPreload />
-        <NavBar />
+        <Suspense fallback={<CardSkeleton />}>
+          <FontPreload />
+        </Suspense>
+        <Suspense fallback={<CardSkeleton />}>
+          <NavBar />
+        </Suspense>
         <main id="main-content" className="min-h-screen bg-background">
           <SectionContainer id="landing-section">
-            <Landing />
+            <SectionWrapper id="landing" fallbackMessage="Failed to load the landing section. Please refresh the page.">
+              <Landing />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="about-section">
-            <About />
+            <SectionWrapper id="about" fallbackMessage="Failed to load the about section. Please refresh the page.">
+              <About />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="services-section">
-            <Services />
+            <SectionWrapper id="services" fallbackMessage="Failed to load the services section. Please refresh the page.">
+              <Services />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="transformations-section">
-            <Transformations />
+            <SectionWrapper id="transformations" fallbackMessage="Failed to load the transformations section. Please refresh the page.">
+              <Transformations />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="feedback-section">
-            <Feedback />
+            <SectionWrapper id="feedback" fallbackMessage="Failed to load the feedback section. Please refresh the page.">
+              <Feedback />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="packages-section">
-            <Packages />
+            <SectionWrapper id="packages" fallbackMessage="Failed to load the packages section. Please refresh the page.">
+              <Packages />
+            </SectionWrapper>
           </SectionContainer>
           
           <SectionContainer id="faq-section">
-            <FAQ />
+            <SectionWrapper id="faq" fallbackMessage="Failed to load the FAQ section. Please refresh the page.">
+              <FAQ />
+            </SectionWrapper>
           </SectionContainer>
         </main>
-        <Footer />
-        <ScrollToTop />
+        <Suspense fallback={<CardSkeleton />}>
+          <Footer />
+        </Suspense>
+        <Suspense fallback={null}>
+          <ScrollToTop />
+        </Suspense>
       </ScrollContext.Provider>
     </div>
   );
@@ -161,7 +195,7 @@ const Home = () => {
 // Memoized App component
 const App = memo(() => {
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
