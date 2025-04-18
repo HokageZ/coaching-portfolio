@@ -15,10 +15,9 @@ export default {
         'input-bg': '#222',
       },
       fontFamily: {
-        'chakra': ['Chakra Petch', 'system-ui', 'sans-serif'],
-        'sans': ['Chakra Petch', 'system-ui', 'sans-serif'],
-        'arabic': ['Readex Pro', 'sans-serif'],
         'english': ['Chakra Petch', 'system-ui', 'sans-serif'],
+        'arabic': ['Readex Pro', 'sans-serif'],
+        'sans': ['Chakra Petch', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(circle at 20% 20%, rgba(182, 13, 13, 0.03) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(182, 13, 13, 0.03) 0%, transparent 50%)',

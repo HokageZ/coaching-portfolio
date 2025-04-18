@@ -3,6 +3,8 @@ import { useEffect, createContext, useState, useCallback, useContext, useMemo, m
 import { useLanguage } from './context/LanguageContext';
 import { CardSkeleton } from './components/ui/Skeleton';
 import ErrorBoundary from './components/ui/ErrorBoundary';
+import StaticPatterns from './components/animations/AnimatedPatterns';
+import { Analytics } from "@vercel/analytics/react";
 
 // Lazy load layout components
 const NavBar = lazy(() => import('./components/layout/NavBar'));
@@ -130,7 +132,7 @@ const Home = () => {
   }), [isScrolling, visibleSections, setVisibleSection]);
   
   return (
-    <div className={`${isChangingLanguage ? 'overflow-hidden' : ''}`}>
+    <div className="scroll-smooth antialiased">
       <ScrollContext.Provider value={contextValue}>
         <Suspense fallback={<CardSkeleton />}>
           <FontPreload />
@@ -200,6 +202,7 @@ const App = memo(() => {
         <Route path="/" element={<Home />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Analytics />
     </Router>
   );
 });

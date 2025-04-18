@@ -1,5 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Readex+Pro:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Readex+Pro:wght@300;400;500;600;700&display=swap');
 
 /* Font preloading hints for critical fonts */
 @supports (font-display: swap) {
@@ -13,21 +12,62 @@
 @tailwind utilities;
 
 :root {
-  --primary: #B60D0D;
-  --primary-hover: #950B0B;
-  --primary-soft: rgba(182, 13, 13, 0.3);
-  --bg-dark: #000000;
+  --primary-color: #B60D0D;
+  --secondary-color: #950B0B;
+  --accent-color: rgba(182, 13, 13, 0.3);
+  --text-color: #ffffff;
+  --background-color: #000000;
+  --card-background: rgba(0, 0, 0, 0.85);
+  --transition-speed: 0.3s;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --max-width: 1200px;
+  --font-english: 'Chakra Petch', system-ui, sans-serif;
+  --font-arabic: 'Readex Pro', sans-serif;
 }
 
 /* Base styles */
 body {
-  color: white;
-  background-color: var(--bg-dark);
-  font-family: 'Chakra Petch', sans-serif;
-  overflow-x: hidden;
+  @apply font-english;
+  @apply bg-black text-white;
+  @apply min-h-screen;
   line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-color);
+  overflow-x: hidden;
+  transition: background-color var(--transition-speed);
+}
+
+/* Global Font Rules - Apply fonts automatically based on document language */
+/* Default - English mode (Chakra Petch) */
+h1, h2, h3, h4, h5, h6, p, span, div, button, a, li, input, textarea, label, select {
+  font-family: var(--font-english);
+}
+
+/* Arabic mode (Readex Pro) */
+[dir="rtl"] h1:not(.english-text):not(.brand-name), 
+[dir="rtl"] h2:not(.english-text):not(.brand-name), 
+[dir="rtl"] h3:not(.english-text):not(.brand-name), 
+[dir="rtl"] h4:not(.english-text):not(.brand-name), 
+[dir="rtl"] h5:not(.english-text):not(.brand-name), 
+[dir="rtl"] h6:not(.english-text):not(.brand-name), 
+[dir="rtl"] p:not(.english-text):not(.brand-name), 
+[dir="rtl"] span:not(.english-text):not(.brand-name), 
+[dir="rtl"] div:not(.english-text):not(.brand-name), 
+[dir="rtl"] button:not(.english-text):not(.brand-name), 
+[dir="rtl"] a:not(.english-text):not(.brand-name), 
+[dir="rtl"] li:not(.english-text):not(.brand-name), 
+[dir="rtl"] input:not(.english-text):not(.brand-name), 
+[dir="rtl"] textarea:not(.english-text):not(.brand-name), 
+[dir="rtl"] label:not(.english-text):not(.brand-name),
+[dir="rtl"] select:not(.english-text):not(.brand-name) {
+  font-family: var(--font-arabic) !important;
+}
+
+/* Always ensure logo and specific English content keeps Chakra Petch */
+.english-text, .brand-name, .logo-area *, .dr-text, .fares-text, .coaching-text, .dr-fares-coaching-container, .dr-fares-title,
+footer .brand-name, footer .dr-text, footer .fares-text, footer .coaching-text, footer .dr-fares-coaching-container, footer .dr-fares-title {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
 }
 
 /* Modern scrollbar - single definition */
@@ -40,12 +80,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
+  background: var(--primary-color);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-hover);
+  background: var(--secondary-color);
 }
 
 /* Enhanced text shadows */
@@ -61,7 +101,7 @@ body {
 .gradient-text {
   position: relative;
   display: inline-block;
-  color: var(--primary);
+  color: var(--primary-color);
   background-clip: text;
   -webkit-background-clip: text;
   font-weight: bold;
@@ -91,7 +131,7 @@ body {
 
 .glass-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(var(--primary), 0.1);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(var(--primary-color), 0.1);
 }
 
 /* Improved animations */
@@ -180,7 +220,6 @@ body {
   @apply bg-primary hover:bg-primary-hover text-white font-bold py-3 px-6 rounded-lg transition-all duration-300;
   position: relative;
   overflow: hidden;
-  z-index: 1;
 }
 
 .btn-primary::after {
@@ -203,23 +242,6 @@ body {
   @apply border-2 border-primary text-primary font-bold py-3 px-6 rounded-lg transition-all duration-300;
   position: relative;
   overflow: hidden;
-  z-index: 1;
-}
-
-.btn-outline::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: rgba(182, 13, 13, 0.1);
-  transition: transform 0.3s ease;
-  z-index: -1;
-}
-
-.btn-outline:hover::before {
-  transform: translateX(100%);
 }
 
 /* Section dividers */
@@ -227,26 +249,25 @@ body {
   position: relative;
   height: 5px;
   width: 100%;
-  background: linear-gradient(90deg, transparent, var(--primary), transparent);
+  background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
   margin: 3rem 0;
   opacity: 0.3;
 }
 
 /* Focus styles for better accessibility */
 :focus {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
 
 /* Improved section spacing for mobile */
 section {
-  padding: 3rem 0;
   position: relative;
 }
 
 @media (min-width: 768px) {
   section {
-    padding: 5rem 0;
+    position: relative;
   }
 }
 
@@ -260,10 +281,11 @@ section {
   html {
     scroll-behavior: smooth;
     font-size: 16px; /* Base font size */
+    font-family: var(--font-english);
   }
   
   body {
-    @apply bg-background text-white min-h-screen w-full overflow-x-hidden relative font-chakra;
+    @apply bg-background text-white min-h-screen w-full overflow-x-hidden relative font-english;
     /* Removed background pattern */
     /* Disable pull-to-refresh in mobile browsers */
     overscroll-behavior-y: none;
@@ -284,7 +306,11 @@ section {
 
 @layer components {
   .section {
-    @apply min-h-screen w-full pt-24 pb-16 px-4 md:py-20 md:px-8;
+    @apply min-h-screen w-full px-4 md:px-8;
+  }
+  
+  .content-padding {
+    @apply py-12;
   }
   
   .container {
@@ -292,19 +318,19 @@ section {
   }
   
   .heading {
-    @apply text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 font-chakra;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 font-english;
   }
   
   .subheading {
-    @apply text-xl md:text-2xl lg:text-3xl font-semibold mb-4 md:mb-6 font-chakra;
+    @apply text-xl md:text-2xl lg:text-3xl font-semibold mb-4 md:mb-6 font-english;
   }
   
   .btn {
-    @apply px-4 md:px-6 py-3 rounded-lg font-medium transition-all duration-300 font-chakra;
+    @apply px-4 md:px-6 py-3 rounded-lg font-medium transition-all duration-300 font-english;
   }
   
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-hover;
+    @apply bg-primary-color text-white hover:bg-secondary-color;
   }
 
   .pattern-area {
@@ -324,11 +350,11 @@ section {
   }
   
   .logo-area h2 {
-    @apply text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 font-chakra tracking-wider;
+    @apply text-xl md:text-2xl lg:text-3xl font-bold text-white m-0 font-english tracking-wider;
   }
   
   .logo-area p {
-    @apply text-xs md:text-sm lg:text-base text-white m-0 font-chakra tracking-widest;
+    @apply text-xs md:text-sm lg:text-base text-white m-0 font-english tracking-widest;
   }
   
   /* Mobile optimized grid layouts */
@@ -379,12 +405,13 @@ button:focus-visible {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: var(--font-arabic);
 }
 
 /* Only apply Arabic font to Arabic characters */
 [dir="rtl"] *:lang(ar),
 [dir="rtl"] *:not(:lang(en)) {
-  font-family: 'Readex Pro', sans-serif !important;
+  font-family: var(--font-arabic) !important;
   letter-spacing: -0.02em; /* Reduce letter spacing for Arabic */
   line-height: 1.7; /* Increase line height for better readability */
 }
@@ -393,7 +420,7 @@ button:focus-visible {
 [dir="rtl"] *:lang(en),
 [dir="rtl"] .brand-name,
 [dir="rtl"] .english-text {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
 }
 
 /* Keep navbar always LTR regardless of language */
@@ -459,7 +486,7 @@ button:focus-visible {
 
 /* Arabic font usage classes */
 .font-arabic {
-  font-family: 'Readex Pro', sans-serif !important;
+  font-family: var(--font-arabic) !important;
   font-weight: 500;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -468,7 +495,7 @@ button:focus-visible {
 
 /* Class for explicitly marking English text in Arabic context */
 .font-english {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
   font-weight: 500;
 }
 
@@ -508,7 +535,7 @@ button:focus-visible {
 [dir="rtl"] h2, 
 [dir="rtl"] h3 {
   font-weight: 700;
-  line-height: 1.4;
+  line-delay: 1.4;
   letter-spacing: -0.01em;
 }
 
@@ -562,12 +589,12 @@ button:focus-visible {
 /* Brand name should always use English font and LTR direction */
 .brand-name {
   direction: ltr !important;
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
   display: inline-block !important;
 }
 
 .brand-name * {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
 }
 
 /* Force English font for DR FARES and COACHING text */
@@ -575,7 +602,7 @@ button:focus-visible {
 .fares-text,
 .coaching-text,
 .logo-text {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
   direction: ltr !important;
 }
 
@@ -585,7 +612,7 @@ h1.fares-text, h2.fares-text, h3.fares-text, h4.fares-text, span.fares-text, p.f
 h1.coaching-text, h2.coaching-text, h3.coaching-text, h4.coaching-text, span.coaching-text, p.coaching-text,
 h1.logo-text, h2.logo-text, h3.logo-text, h4.logo-text, span.logo-text, p.logo-text,
 h1.brand-name, h2.brand-name, h3.brand-name, h4.brand-name, span.brand-name, p.brand-name {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
   direction: ltr !important;
 }
 
@@ -601,19 +628,15 @@ nav .logo-area h2,
 nav .logo-area span,
 footer .brand-name h2,
 footer .brand-name span,
-footer .brand-name p {
-  font-family: 'Chakra Petch', sans-serif !important;
+footer .brand-name p,
+footer .dr-fares-coaching-container h2,
+footer .dr-fares-coaching-container p,
+footer .dr-fares-coaching-container span,
+footer [lang="en"] h2,
+footer [lang="en"] p,
+footer [lang="en"] span {
+  font-family: var(--font-english) !important;
   direction: ltr !important;
-  font-weight: bold !important;
-}
-
-/* Extra specific for Arabic mode */
-[dir="rtl"] .brand-name,
-[dir="rtl"] .brand-name *,
-[dir="rtl"] .logo-area h2,
-[dir="rtl"] .logo-area span,
-[dir="rtl"] .logo-area p {
-  font-family: 'Chakra Petch', sans-serif !important;
   font-weight: bold !important;
 }
 
@@ -623,44 +646,278 @@ footer .brand-name p {
 [class*="brand"],
 [class*="logo"],
 [class*="coaching"] {
-  font-family: 'Chakra Petch', sans-serif !important;
+  font-family: var(--font-english) !important;
 }
 
 /* Extra specific classes for branding */
 .dr-fares-coaching-container,
 .dr-fares-coaching-container *,
+.dr-fares-coaching-container h2,
+.dr-fares-coaching-container p,
+.dr-fares-coaching-container span,
 .dr-fares-title,
 .dr-text,
 .fares-text,
 .coaching-text,
-.dr-fares-coaching-text {
-  font-family: 'Chakra Petch', sans-serif !important;
+.dr-fares-coaching-text,
+footer .dr-fares-coaching-container,
+footer .dr-fares-coaching-container *,
+footer .dr-fares-coaching-container h2,
+footer .dr-fares-coaching-container p,
+footer .dr-fares-coaching-container span,
+footer [lang="en"],
+footer [lang="en"] * {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Override for Arabic mode */
+[dir="rtl"] .dr-fares-coaching-container,
+[dir="rtl"] .dr-fares-coaching-container *,
+[dir="rtl"] .dr-fares-coaching-container h2,
+[dir="rtl"] .dr-fares-coaching-container p,
+[dir="rtl"] .dr-fares-coaching-container span,
+[dir="rtl"] .dr-fares-title,
+[dir="rtl"] .dr-text,
+[dir="rtl"] .fares-text,
+[dir="rtl"] .coaching-text,
+[dir="rtl"] .dr-fares-coaching-text,
+[dir="rtl"] footer .dr-fares-coaching-container,
+[dir="rtl"] footer .dr-fares-coaching-container *,
+[dir="rtl"] footer .dr-fares-coaching-container h2,
+[dir="rtl"] footer .dr-fares-coaching-container p,
+[dir="rtl"] footer .dr-fares-coaching-container span,
+[dir="rtl"] footer [lang="en"],
+[dir="rtl"] footer [lang="en"] * {
+  font-family: var(--font-english) !important;
   direction: ltr !important;
 }
 
 /* Highest specificity selectors for Arabic mode */
 html[lang="ar"] .dr-fares-coaching-container,
 html[lang="ar"] .dr-fares-coaching-container *,
+html[lang="ar"] .dr-fares-coaching-container h2,
+html[lang="ar"] .dr-fares-coaching-container p,
+html[lang="ar"] .dr-fares-coaching-container span,
 html[lang="ar"] .dr-fares-title,
 html[lang="ar"] .dr-text,
 html[lang="ar"] .fares-text,
 html[lang="ar"] .coaching-text,
 html[lang="ar"] .dr-fares-coaching-text,
-html[lang="ar"] span.dr-text,
-html[lang="ar"] span.fares-text,
-html[lang="ar"] span.coaching-text,
-html[lang="ar"] p.coaching-text,
-html[lang="ar"] .brand-name,
-html[lang="ar"] .brand-name * {
-  font-family: 'Chakra Petch', sans-serif !important;
+html[lang="ar"] footer .dr-fares-coaching-container,
+html[lang="ar"] footer .dr-fares-coaching-container *,
+html[lang="ar"] footer .dr-fares-coaching-container h2,
+html[lang="ar"] footer .dr-fares-coaching-container p,
+html[lang="ar"] footer .dr-fares-coaching-container span,
+html[lang="ar"] footer [lang="en"],
+html[lang="ar"] footer [lang="en"] * {
+  font-family: var(--font-english) !important;
   direction: ltr !important;
 }
 
-/* General override for branding elements */
-[class*="dr-"],
-[class*="fares-"],
-[class*="brand"],
-[class*="logo"],
-[class*="coaching"] {
-  font-family: 'Chakra Petch', sans-serif !important;
+/* Font fallbacks */
+@font-face {
+  font-family: 'Chakra Petch';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Chakra Petch'), local('ChakraPetch-Regular'),
+       url('https://fonts.gstatic.com/s/chakrapetch/v9/cIflMapbsEk7TDLdtEz1BwkeNIhFQJXE3AY00g.woff2') format('woff2');
+}
+
+/* Prevent layout shifts */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  min-height: 100vh;
+  text-rendering: optimizeSpeed;
+  line-height: 1.5;
+}
+
+/* Ensure Chakra Petch is used for brand elements */
+.brand-name, .dr-text, .fares-text, .coaching-text, 
+.dr-fares-coaching-container, .dr-fares-title, .dr-fares-coaching-text {
+  font-family: var(--font-english) !important;
+}
+
+/* Force Chakra Petch for these elements even in Arabic mode */
+html[lang="ar"] .brand-name, 
+html[lang="ar"] .dr-text, 
+html[lang="ar"] .fares-text, 
+html[lang="ar"] .coaching-text,
+html[lang="ar"] .dr-fares-coaching-container,
+html[lang="ar"] .dr-fares-title,
+html[lang="ar"] .dr-fares-coaching-text {
+  font-family: var(--font-arabic) !important;
+  direction: ltr !important;
+}
+
+/* Global font rules */
+:root {
+  --font-english: 'Chakra Petch', system-ui, sans-serif;
+  --font-arabic: 'Readex Pro', sans-serif;
+}
+
+/* Base font settings */
+html {
+  font-family: var(--font-english);
+}
+
+/* Arabic text settings */
+[lang="ar"] {
+  font-family: var(--font-arabic);
+}
+
+/* Force English font for branding elements */
+.brand-name,
+.dr-text,
+.fares-text,
+.coaching-text,
+.dr-fares-coaching-container,
+.dr-fares-title,
+footer .brand-name,
+footer .dr-text,
+footer .fares-text,
+footer .coaching-text,
+.dr-fares-coaching-text,
+footer .dr-fares-coaching-container,
+footer .dr-fares-coaching-container *,
+footer .dr-fares-coaching-container h2,
+footer .dr-fares-coaching-container p,
+footer .dr-fares-coaching-container span,
+footer [lang="en"],
+footer [lang="en"] * {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Ensure Arabic text uses Arabic font */
+.arabic-text {
+  font-family: var(--font-arabic);
+}
+
+/* Force Chakra Petch for specific branding container */
+.dr-fares-coaching-container,
+.dr-fares-coaching-container *,
+.dr-fares-coaching-container h2,
+.dr-fares-coaching-container p,
+.dr-fares-coaching-container span,
+.dr-fares-title,
+.dr-text,
+.fares-text,
+.coaching-text,
+.dr-fares-coaching-text,
+footer .dr-fares-coaching-container,
+footer .dr-fares-coaching-container *,
+footer .dr-fares-coaching-container h2,
+footer .dr-fares-coaching-container p,
+footer .dr-fares-coaching-container span,
+footer [lang="en"],
+footer [lang="en"] * {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Override for Arabic mode */
+[dir="rtl"] .dr-fares-coaching-container,
+[dir="rtl"] .dr-fares-coaching-container *,
+[dir="rtl"] .dr-fares-coaching-container h2,
+[dir="rtl"] .dr-fares-coaching-container p,
+[dir="rtl"] .dr-fares-coaching-container span,
+[dir="rtl"] .dr-fares-title,
+[dir="rtl"] .dr-text,
+[dir="rtl"] .fares-text,
+[dir="rtl"] .coaching-text,
+[dir="rtl"] .dr-fares-coaching-text,
+[dir="rtl"] footer .dr-fares-coaching-container,
+[dir="rtl"] footer .dr-fares-coaching-container *,
+[dir="rtl"] footer .dr-fares-coaching-container h2,
+[dir="rtl"] footer .dr-fares-coaching-container p,
+[dir="rtl"] footer .dr-fares-coaching-container span,
+[dir="rtl"] footer [lang="en"],
+[dir="rtl"] footer [lang="en"] * {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Highest specificity selectors for Arabic mode */
+html[lang="ar"] .dr-fares-coaching-container,
+html[lang="ar"] .dr-fares-coaching-container *,
+html[lang="ar"] .dr-fares-coaching-container h2,
+html[lang="ar"] .dr-fares-coaching-container p,
+html[lang="ar"] .dr-fares-coaching-container span,
+html[lang="ar"] .dr-fares-title,
+html[lang="ar"] .dr-text,
+html[lang="ar"] .fares-text,
+html[lang="ar"] .coaching-text,
+html[lang="ar"] .dr-fares-coaching-text,
+html[lang="ar"] footer .dr-fares-coaching-container,
+html[lang="ar"] footer .dr-fares-coaching-container *,
+html[lang="ar"] footer .dr-fares-coaching-container h2,
+html[lang="ar"] footer .dr-fares-coaching-container p,
+html[lang="ar"] footer .dr-fares-coaching-container span,
+html[lang="ar"] footer [lang="en"],
+html[lang="ar"] footer [lang="en"] * {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Force English font for branding elements */
+.brand-name,
+.dr-text,
+.fares-text,
+.coaching-text,
+.dr-fares-title,
+.dr-fares-coaching-text,
+.dr-fares-coaching-container,
+.english-text,
+[lang="en"],
+[dir="ltr"] {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Override for Arabic mode */
+[dir="rtl"] .brand-name,
+[dir="rtl"] .dr-text,
+[dir="rtl"] .fares-text,
+[dir="rtl"] .coaching-text,
+[dir="rtl"] .dr-fares-title,
+[dir="rtl"] .dr-fares-coaching-text,
+[dir="rtl"] .dr-fares-coaching-container,
+[dir="rtl"] .english-text,
+[dir="rtl"] [lang="en"],
+[dir="rtl"] [dir="ltr"] {
+  font-family: var(--font-english) !important;
+  direction: ltr !important;
+}
+
+/* Force LTR for branding elements */
+.brand-name,
+.dr-text,
+.fares-text,
+.coaching-text,
+.dr-fares-title,
+.dr-fares-coaching-text,
+.dr-fares-coaching-container,
+.english-text,
+[lang="en"],
+[dir="ltr"] {
+  direction: ltr !important;
+}
+
+/* Override for Arabic mode */
+[dir="rtl"] .brand-name,
+[dir="rtl"] .dr-text,
+[dir="rtl"] .fares-text,
+[dir="rtl"] .coaching-text,
+[dir="rtl"] .dr-fares-title,
+[dir="rtl"] .dr-fares-coaching-text,
+[dir="rtl"] .dr-fares-coaching-container,
+[dir="rtl"] .english-text,
+[dir="rtl"] [lang="en"],
+[dir="rtl"] [dir="ltr"] {
+  direction: ltr !important;
 }

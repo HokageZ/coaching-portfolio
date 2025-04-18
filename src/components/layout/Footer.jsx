@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 const Footer = () => {
@@ -21,7 +20,6 @@ const Footer = () => {
   }, []);
   
   const handleScrollToTop = () => {
-    // Use window.scrollTo with a shorter duration for immediate response
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -31,13 +29,11 @@ const Footer = () => {
   const handleScrollToSection = (id) => {
     const element = document.getElementById(id);
     if (element) {
-      // Get navbar height for offset with additional padding for better positioning
       const navbarHeight = document.querySelector('nav')?.offsetHeight || 0;
-      const padding = 20; // Additional padding to ensure the section is fully visible
+      const padding = 20;
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - navbarHeight - padding;
       
-      // Use requestAnimationFrame for smoother scrolling
       const duration = 800;
       const start = window.pageYOffset;
       const distance = offsetPosition - start;
@@ -59,7 +55,6 @@ const Footer = () => {
       
       window.requestAnimationFrame(step);
       
-      // Update URL hash for better navigation
       window.history.pushState(null, null, `#${id}`);
     }
   };
@@ -144,21 +139,13 @@ const Footer = () => {
     const [isHovered, setIsHovered] = useState(false);
     
     return (
-      <motion.a 
+      <a 
         href={link.url}
         className="relative"
         target="_blank"
         rel="noopener noreferrer"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        whileHover={{ y: -5 }}
-        whileTap={{ scale: 0.95 }}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ 
-          duration: 0.3, 
-          delay: index * 0.1
-        }}
         aria-label={`Visit our ${link.name} page`}
       >
         {/* Glass Card Style */}
@@ -168,52 +155,49 @@ const Footer = () => {
           }}
         >
           {/* Background glow effect */}
-          <motion.div 
-            className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/0 via-primary/20 to-primary/0 opacity-0 z-0 blur-xl"
-            animate={{ opacity: isHovered ? 0.7 : 0 }}
-            transition={{ duration: 0.4 }}
+          <div 
+            className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/0 via-primary/20 to-primary/0 z-0 blur-xl"
+            style={{ opacity: isHovered ? 0.7 : 0 }}
           />
           
           {/* Card accent */}
-          <motion.div 
+          <div 
             className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/30 via-primary to-primary/30"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: isHovered ? 1 : 0 }}
-            transition={{ duration: 0.3 }}
+            style={{ transform: isHovered ? 'scaleX(1)' : 'scaleX(0)' }}
           />
           
           {/* Icon Container */}
-          <motion.div 
+          <div 
             className="relative z-10"
-            animate={{ 
-              scale: isHovered ? 1.1 : 1,
+            style={{ 
+              transform: isHovered ? 'scale(1.1)' : 'scale(1)',
               color: isHovered ? '#B60D0D' : '#ffffff'
             }}
-            transition={{ duration: 0.3 }}
           >
             <SocialIcon type={link.icon} />
-          </motion.div>
+          </div>
           
           {/* Corner accent */}
-          <motion.div 
+          <div 
             className="absolute bottom-0 right-0 w-6 h-6 z-0 opacity-20"
             style={{ 
               background: 'radial-gradient(circle at bottom right, rgba(182, 13, 13, 0.5), transparent 70%)',
-            }}
-            animate={{ 
               opacity: isHovered ? 0.4 : 0.1,
-              scale: isHovered ? 1.2 : 1
+              transform: isHovered ? 'scale(1.2)' : 'scale(1)'
             }}
           />
         </div>
-      </motion.a>
+      </a>
     );
   };
 
   return (
-    <footer id="footer" className="relative overflow-hidden bg-black pt-24 pb-12">
+    <footer id="footer" className="relative overflow-hidden bg-black">
       {/* Modern glass/blur overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black to-black/95 backdrop-blur-sm z-0"></div>
+      <div className="absolute inset-0 bg-black z-0"></div>
+      
+      {/* Glowing red line at top */}
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_10px_rgba(182,13,13,0.5)]"></div>
       
       {/* Dynamic grid pattern */}
       <div className="absolute inset-0 z-0 opacity-8" 
@@ -226,46 +210,52 @@ const Footer = () => {
       
       {/* Red accent lighting effects - stronger look */}
       <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-full h-40 bg-primary/40 rounded-full blur-[120px] opacity-50"></div>
-      <div className="absolute -top-32 left-1/4 w-72 h-72 bg-primary/20 rounded-full blur-[100px] opacity-20"></div>
-      <div className="absolute -bottom-10 right-1/4 w-56 h-56 bg-primary/25 rounded-full blur-[80px] opacity-30"></div>
       
-      {/* Top accent line - matches header style */}
-      <motion.div 
-        className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent z-10"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        transition={{ duration: 2, ease: "easeOut" }}
-        viewport={{ once: true }}
-      />
-      
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-6 relative z-10 py-10">
         {/* Main content area */}
-        <div className="flex flex-col items-center mb-16">
-          {/* Logo with shadow effect */}
-          <motion.div 
-            className="mb-8 text-center brand-name english-text ltr dr-fares-coaching-container"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            style={{ direction: 'ltr' }}
+        <div className="flex flex-col items-center">
+          {/* Logo with shadow effect - Completely independent of language context */}
+          <div 
+            className="mb-6 text-center brand-name english-text ltr dr-fares-coaching-container"
+            style={{ 
+              direction: 'ltr',
+              fontFamily: 'var(--font-english) !important'
+            }}
+            lang="en"
+            dir="ltr"
           >
-            <h2 className="text-4xl font-bold font-english font-chakra tracking-wide leading-none dr-fares-title">
-              <span className="text-primary drop-shadow-[0_0_8px_rgba(182,13,13,0.3)] mr-2 font-english font-chakra dr-text">DR</span> 
-              <span className="text-white font-english font-chakra fares-text">FARES</span>
+            <h2 
+              className="text-4xl font-bold tracking-wide leading-none dr-fares-title font-english" 
+              lang="en" 
+              dir="ltr"
+              style={{ fontFamily: 'var(--font-english) !important' }}
+            >
+              <span 
+                className="text-primary drop-shadow-[0_0_8px_rgba(182,13,13,0.3)] mr-2 dr-text"
+                style={{ fontFamily: 'var(--font-english) !important' }}
+              >
+                DR
+              </span> 
+              <span 
+                className="text-white fares-text"
+                style={{ fontFamily: 'var(--font-english) !important' }}
+              >
+                FARES
+              </span>
             </h2>
-            <p className="text-white/80 text-lg font-light mt-1 font-english font-chakra tracking-wider coaching-text">COACHING</p>
-          </motion.div>
+            <p 
+              className="text-white/80 text-lg font-light mt-1 tracking-wider coaching-text font-english" 
+              lang="en" 
+              dir="ltr"
+              style={{ fontFamily: 'var(--font-english) !important' }}
+            >
+              COACHING
+            </p>
+          </div>
           
           {/* Social Media Icons - Glass Card Style */}
-          <motion.div 
-            className="flex flex-col items-center mb-10"
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            <p className="text-gray-400 text-sm font-light mb-5" 
+          <div className="flex flex-col items-center mb-4">
+            <p className={`text-gray-400 text-sm font-light mb-4 ${language === 'en' ? 'font-english' : ''}`} 
                style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>{t('footer.connect')}</p>
             <div className="flex justify-center gap-4">
               {socialLinks.map((link, index) => {
@@ -274,47 +264,37 @@ const Footer = () => {
                 );
               })}
             </div>
-          </motion.div>
+          </div>
           
           {/* Copyright */}
-          <motion.div 
-            className="text-center text-gray-600 text-sm"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            &copy; {new Date().getFullYear()} <span className="font-english font-chakra ltr dr-fares-coaching-text" style={{ direction: 'ltr', display: 'inline-block' }}>DR FARES COACHING</span>. {t('footer.rights')}
-          </motion.div>
+          <div className="text-center text-gray-600 text-sm">
+            <span className={`${language === 'en' ? 'font-english' : ''}`} style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+              &copy; {new Date().getFullYear()} 
+            </span> 
+            <span className="font-english ltr dr-fares-coaching-text brand-name" style={{ direction: 'ltr', display: 'inline-block' }} lang="en">
+              DR FARES COACHING
+            </span>
+            <span className={`${language === 'en' ? 'font-english' : ''}`} style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+              . {t('footer.rights')}
+            </span>
+          </div>
         </div>
       </div>
       
       {/* Back to top button - Premium Glass Style */}
-      <AnimatePresence>
-        {showScrollButton && (
-          <motion.button
-            className="fixed bottom-6 right-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white z-50 overflow-hidden group"
-            onClick={handleScrollToTop}
-            aria-label="Back to top"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            whileHover={{ y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-          >
-            <motion.div 
-              className="relative z-10"
-              animate={{ y: [0, -3, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, repeatType: "reverse" }}
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-              </svg>
-            </motion.div>
-          </motion.button>
-        )}
-      </AnimatePresence>
+      {showScrollButton && (
+        <button
+          className="fixed bottom-6 right-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white z-50 overflow-hidden group"
+          onClick={handleScrollToTop}
+          aria-label="Back to top"
+        >
+          <div className="relative z-10">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </div>
+        </button>
+      )}
     </footer>
   );
 };

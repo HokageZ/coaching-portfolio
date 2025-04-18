@@ -58,10 +58,19 @@ export const LanguageProvider = ({ children }) => {
   // Set document direction based on language
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Add RTL class before changing direction to prevent layout shift
+      document.body.classList.add('rtl');
       document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
       document.documentElement.lang = language;
       document.body.classList.toggle('rtl', language === 'ar');
       document.body.classList.toggle('ltr', language === 'en');
+      
+      // Force font application for branding elements
+      const brandingElements = document.querySelectorAll('.brand-name, .dr-text, .fares-text, .coaching-text, .dr-fares-coaching-container, .dr-fares-title');
+      brandingElements.forEach(el => {
+        el.style.fontFamily = 'var(--font-english)';
+        el.style.direction = 'ltr';
+      });
     }
   }, [language]);
   
@@ -90,7 +99,7 @@ export const LanguageProvider = ({ children }) => {
             <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
             
             {/* Message with appropriate font based on target language */}
-            <div className={`text-white text-2xl ${language === 'ar' ? 'font-chakra' : 'font-arabic'}`}>
+            <div className={`text-white text-2xl ${language === 'ar' ? 'font-english' : 'font-arabic'}`}>
               {language === 'ar' ? 'Changing to English...' : 'جاري التغيير للعربية...'}
             </div>
           </div>

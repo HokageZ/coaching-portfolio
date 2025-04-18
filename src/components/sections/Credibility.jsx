@@ -31,8 +31,8 @@ const Credibility = () => {
   ];
 
   return (
-    <section id="credibility" className="py-20 bg-neutral-900">
-      <div className="container mx-auto px-4">
+    <section id="credibility" className="bg-neutral-900">
+      <div className="container mx-auto px-4 py-20">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">

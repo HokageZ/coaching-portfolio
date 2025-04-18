@@ -16,6 +16,25 @@ const NavBar = () => {
   const scrollTimer = useRef(null);
   const sectionRefs = useRef([]);
 
+  // Prevent scrolling when mobile menu is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isMobileMenuOpen]);
+
   // Cache section elements on mount
   useEffect(() => {
     sectionRefs.current = Array.from(document.getElementsByTagName('section'))
@@ -29,11 +48,11 @@ const NavBar = () => {
       requestAnimationFrame(() => {
         const scrollY = window.scrollY;
         
-        // Hide/show navbar on scroll
+        // Hide/show navbar on scroll with debounce
         if (scrollY > 300) {
           if (scrollY > prevScrollY + 15 && !isMobileMenuOpen) {
             setIsNavVisible(false);
-          } else if (scrollY < prevScrollY - 10 || isMobileMenuOpen) {
+          } else if (scrollY < prevScrollY - 5 || isMobileMenuOpen) {
             setIsNavVisible(true);
           }
         } else {
@@ -117,16 +136,20 @@ const NavBar = () => {
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - navHeight;
 
-      window.scrollTo({
-        top: id === 'footer' ? document.body.scrollHeight : offsetPosition,
-        behavior: 'smooth'
-      });
+      // First close the mobile menu
+      setIsMobileMenuOpen(false);
       
-      window.history.pushState(null, null, `#${id}`);
+      // Wait for the menu to close before scrolling
+      setTimeout(() => {
+        window.scrollTo({
+          top: id === 'footer' ? document.body.scrollHeight : offsetPosition,
+          behavior: 'smooth'
+        });
+        
+        window.history.pushState(null, null, `#${id}`);
+        setActiveSection(id);
+      }, 300); // Wait for the menu animation to complete
     }
-    
-    setIsMobileMenuOpen(false);
-    setActiveSection(id);
   };
 
   // Toggle language function
@@ -184,7 +207,7 @@ const NavBar = () => {
       ? `w-full py-4 flex items-center justify-between border-b border-white/10 ${
           activeSection === item.id ? 'text-primary' : 'text-white'
         }`
-      : `text-sm font-medium font-chakra transition-all duration-200 relative overflow-hidden py-2 px-1 ${
+      : `text-sm font-medium transition-all duration-200 relative overflow-hidden py-2 px-1 ${
           activeSection === item.id ? 'text-white' : 'text-gray-400 hover:text-white'
         }`;
 
@@ -207,7 +230,7 @@ const NavBar = () => {
       >
         {isMobile ? (
           <>
-            <span className="text-xl font-chakra font-medium">{item.label}</span>
+            <span className="text-xl font-medium">{item.label}</span>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center ${
                 activeSection === item.id ? 'bg-primary/20 text-primary' : 'text-gray-400'
@@ -239,7 +262,7 @@ const NavBar = () => {
     const anim = isMobile ? animations.mobile : animations.desktop;
     const classes = isMobile
       ? "w-full py-4 flex items-center justify-between border-b border-white/10 mt-4 relative overflow-hidden"
-      : "text-sm font-medium font-chakra transition-all duration-200 relative py-2 px-3 ml-2 rounded-full bg-white/5 hover:bg-white/10 flex items-center gap-2 overflow-hidden";
+      : "text-sm font-medium transition-all duration-200 relative py-2 px-3 ml-2 rounded-full bg-white/5 hover:bg-white/10 flex items-center gap-2 overflow-hidden";
     
     return (
       <motion.button
@@ -254,7 +277,7 @@ const NavBar = () => {
       >
         {isMobile ? (
           <>
-            <span className={`text-xl font-medium ${language === 'ar' ? 'font-arabic' : 'font-chakra'}`}>
+            <span className="text-xl font-medium">
               {language === 'en' ? 'English' : 'العربية'}
             </span>
             <div className="w-8 h-8 rounded-full flex items-center justify-center bg-primary/20 text-primary">
@@ -265,7 +288,9 @@ const NavBar = () => {
           </>
         ) : (
           <div className="relative z-10 flex items-center gap-2">
-            <span className={language === 'ar' ? 'font-arabic' : 'font-chakra'}>{language === 'en' ? 'EN' : 'عربي'}</span>
+            <span>
+              {language === 'en' ? 'EN' : 'عربي'}
+            </span>
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
             </svg>
@@ -281,6 +306,37 @@ const NavBar = () => {
     );
   };
 
+  const toggleMobileMenu = () => {
+    if (!isMobileMenuOpen) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore scroll position
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.overflow = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  // Cleanup effect for mobile menu
+  useEffect(() => {
+    return () => {
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.overflow = '';
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY) * -1);
+      }
+    };
+  }, []);
+
   return (
     <>
       <motion.nav 
@@ -290,7 +346,7 @@ const NavBar = () => {
         } ltr`}
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: isNavVisible ? 0 : -100, opacity: isNavVisible ? 1 : 0 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         role="navigation"
         aria-label="Main navigation"
         style={{ direction: 'ltr' }}
@@ -299,9 +355,14 @@ const NavBar = () => {
           <div className="flex items-center justify-between h-14">
             {/* Logo */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
+              transition={{ 
+                delay: 0.3,
+                duration: 0.8,
+                type: "spring",
+                stiffness: 100
+              }}
             >
               <HeaderLogo isScrolled={isScrolled} />
             </motion.div>
@@ -317,21 +378,49 @@ const NavBar = () => {
             {/* Navigation Links - Desktop */}
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item, index) => (
-                <NavItem key={item.id} item={item} index={index} isMobile={false} />
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: 0.4 + index * 0.1,
+                    duration: 0.5,
+                    type: "spring",
+                    stiffness: 100
+                  }}
+                >
+                  <NavItem item={item} index={index} isMobile={false} />
+                </motion.div>
               ))}
-              <LanguageToggle isMobile={false} />
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  delay: 0.4 + navItems.length * 0.1,
+                  duration: 0.5,
+                  type: "spring",
+                  stiffness: 100
+                }}
+              >
+                <LanguageToggle isMobile={false} />
+              </motion.div>
             </div>
 
             {/* Mobile Menu Button */}
             <motion.button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              onClick={toggleMobileMenu}
               className="md:hidden relative z-50 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/10"
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5, duration: 0.3 }}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                delay: 0.6,
+                duration: 0.5,
+                type: "spring",
+                stiffness: 100
+              }}
               whileTap={{ scale: 0.95 }}
               style={{ marginRight: '-4px' }}
             >
@@ -359,9 +448,12 @@ const NavBar = () => {
 
         {/* Interactive background indicator */}
         {isScrolled && (
-          <div 
+          <motion.div 
             className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"
             aria-hidden="true"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
           />
         )}
       </motion.nav>

@@ -1,27 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-import heroBackground from '../../assets/videos/hero-background.mp4';
 
 const Landing = () => {
-  const bgVideoRef = useRef(null);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const { t } = useLanguage();
-
-  // Animation variants
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 40 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 1,
-        ease: "easeOut"
-      }
-    }
-  };
+  const { t, language } = useLanguage();
+  const landingRef = useRef(null);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -36,86 +19,17 @@ const Landing = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (bgVideoRef.current) {
-      const playVideo = async () => {
-        try {
-          // Set a timeout to handle cases where video fails to load
-          const timeoutId = setTimeout(() => {
-            if (!videoLoaded) {
-              console.warn("Video loading timeout - switching to fallback");
-              setVideoError(true);
-            }
-          }, 5000);
-
-          // Ensure video is ready to play
-          if (bgVideoRef.current.readyState < 3) {
-            await new Promise((resolve) => {
-              bgVideoRef.current.addEventListener('canplaythrough', resolve, { once: true });
-            });
-          }
-
-          bgVideoRef.current.playbackRate = 1.15;
-          await bgVideoRef.current.play();
-          clearTimeout(timeoutId);
-          console.log("Background video started playing at 1.15x speed");
-        } catch (error) {
-          console.error("Background video autoplay failed:", error);
-          setVideoError(true);
-        }
-      };
-
-      if (videoLoaded) {
-        playVideo();
-      }
-    }
-  }, [videoLoaded]);
-
-  const handleVideoError = (e) => {
-    console.error("Video error:", e);
-    setVideoError(true);
-  };
-
-  const handleVideoLoad = () => {
-    setVideoLoaded(true);
-    console.log("Video loaded successfully");
-  };
-
   return (
-    <section id="home" className="relative min-h-screen w-full bg-background overflow-hidden">
-      {/* Video Background */}
-      <div className="absolute inset-0 w-full h-full z-0">
-        {!videoError ? (
-          <video
-            ref={bgVideoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onLoadedData={handleVideoLoad}
-            onError={handleVideoError}
-            className="absolute top-0 left-0 w-full h-full object-cover transition-opacity duration-1000"
-            style={{ 
-              filter: 'brightness(0.6) contrast(1.1) sepia(0.3) hue-rotate(-30deg)',
-              opacity: videoLoaded ? 1 : 0,
-              transform: 'scale(1.1)', // Slightly zoom to prevent edges
-              objectPosition: 'center'
-            }}
-          >
-            <source src={heroBackground} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-background/50 to-background/30" />
-        )}
-      </div>
-
+    <section 
+      id="home" 
+      ref={landingRef}
+      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-neutral-900"
+    >
       {/* Background gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-background/30 to-background z-0"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-background/80 to-background z-0"></div>
       
       {/* Texture overlay */}
-      <div className="absolute inset-0 z-0 opacity-[0.1]">
+      <div className="absolute inset-0 z-0 opacity-[0.2]">
         <div 
           className="absolute inset-0"
           style={{
@@ -131,106 +45,74 @@ const Landing = () => {
           }}
         ></div>
       </div>
-      
-      {/* Main content container */}
-      <div className="container relative z-10 min-h-screen flex flex-col items-center justify-center">
-        
-        {/* Hero Text Section */}
-        <div className="w-full max-w-[800px] mx-auto px-4 sm:px-6 text-center mb-8 sm:mb-12 md:mt-20">
-          <motion.h1 
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white uppercase tracking-tighter mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <motion.span 
-              className="block"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-            >
-              {t('landing.title.break')}
-            </motion.span>
-            <motion.span 
-              className="block"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              <span className="text-primary">{t('landing.title.your')}</span> {t('landing.title.limits')}
-            </motion.span>
-          </motion.h1>
-          
-          <motion.p 
-            className="text-base sm:text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-          >
-            {t('landing.subtitle')}
-          </motion.p>
-          
-          <motion.div 
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1 }}
-          >
-            <motion.a
-              href="#footer"
-              className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05, backgroundColor: "#950B0B" }}
-              whileTap={{ scale: 0.98 }}
-              onClick={(e) => {
-                e.preventDefault();
-                const footer = document.getElementById('footer');
-                if (footer) {
-                  footer.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-            >
-              <span className="font-bold tracking-wide">{t('nav.contact')}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </motion.a>
+
+      <div className="relative z-10 container mx-auto px-4 py-32">
+        <div className="max-w-4xl mx-auto text-center mb-12">
+          <div className="space-y-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white">
+              {t('landing.title.break')} <span className="text-primary">{t('landing.title.your')}</span> {t('landing.title.limits')}
+            </h1>
+            <p className="text-xl md:text-2xl text-white/80">
+              {t('landing.subtitle')}
+            </p>
             
-            <motion.a
-              href="#services"
-              className="w-full sm:w-auto bg-transparent text-white border-2 border-white/30 hover:border-white/50 text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
-              whileHover={{ scale: 1.05, borderColor: "rgba(255,255,255,0.8)" }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span className="font-bold tracking-wide">{t('services.title')}</span>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </motion.a>
-          </motion.div>
-        </div>
-        
-        {/* Simplified Video Section */}
-        <motion.div
-          className="w-full px-4 sm:px-6 mb-12 sm:mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.2 }}
-        >
-          <div className="w-full max-w-[900px] mx-auto">
-            <div className="relative rounded-2xl overflow-hidden">
-              <div className="relative w-full pt-[56.25%]">
-                <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src="https://www.youtube.com/embed/3hIJBqjWYxQ?controls=1&modestbranding=1&showinfo=0&rel=0&t=0"
-                  title="Transformation Stories"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="#footer"
+                className="w-full sm:w-auto bg-primary hover:bg-primary-hover text-white font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const footer = document.getElementById('footer');
+                  if (footer) {
+                    footer.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                <span className="font-bold tracking-wide">{t('nav.contact')}</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </a>
+              
+              <a
+                href="#about"
+                className="w-full sm:w-auto bg-transparent text-white border-2 border-white/30 hover:border-white/50 font-bold py-4 px-8 rounded-lg transition-all duration-300 flex items-center justify-center gap-2"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const about = document.getElementById('about');
+                  if (about) {
+                    about.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
+              >
+                <span className="font-bold tracking-wide">{t('about.title')}</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </a>
             </div>
           </div>
-        </motion.div>
+        </div>
+
+        {/* YouTube Video Section */}
+        <div className="w-full max-w-[900px] mx-auto mt-16">
+          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-white/5">
+            <div className="relative w-full pt-[56.25%]">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/3hIJBqjWYxQ?controls=1&modestbranding=1&showinfo=0&rel=0&t=0"
+                title="Transformation Stories"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
       </div>
+      
+      {/* Bottom wave/gradient transition */}
+      <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-background to-transparent"></div>
     </section>
   );
 };

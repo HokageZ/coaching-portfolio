@@ -4,19 +4,16 @@ import { useLanguage } from '../../context/LanguageContext';
 /**
  * FontPreload Component
  * 
- * This component ensures both Readex Pro and Chakra Petch fonts are preloaded
- * to support mixed language content, with Arabic text using Readex Pro
- * and English content using Chakra Petch.
+ * This component ensures the document has the right language attributes
+ * to trigger font changes via CSS. Font selection is handled by the global CSS rules.
  */
 const FontPreload = () => {
   const { language } = useLanguage();
   
   useEffect(() => {
-    // Always maintain Chakra Petch as the base font
-    document.documentElement.style.fontFamily = "'Chakra Petch', sans-serif";
-    
-    // Both fonts are loaded from Google Fonts
-    // This component is kept for compatibility
+    // Set document language and direction attributes
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }, [language]);
   
   // This component doesn't render anything visible
