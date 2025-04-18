@@ -131,14 +131,6 @@ const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPri
               ))}
             </select>
           </div>
-          
-          {/* Animated accent */}
-          <motion.div 
-            className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.5 }}
-          />
         </div>
 
         {/* Features List */}
@@ -550,23 +542,6 @@ const Packages = () => {
       
       <div className="container mx-auto px-4 relative z-10">
         <div className="py-12">
-          <div 
-            className="text-center mb-16"
-            style={{ 
-              willChange: 'transform',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-              touchAction: 'pan-y pinch-zoom'
-            }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              {t('packages.title')}
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              {t('packages.subtitle')}
-            </p>
-          </div>
-
           <div className="max-w-4xl mx-auto" style={{ 
             willChange: 'transform',
             backfaceVisibility: 'hidden',

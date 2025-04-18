@@ -47,14 +47,17 @@
   /* Font-size adjustments for headings */
   h1 {
     font-size: 2rem !important;
+    margin-bottom: 1rem !important;
   }
   
   h2 {
     font-size: 1.75rem !important;
+    margin-bottom: 0.875rem !important;
   }
   
   h3 {
     font-size: 1.5rem !important;
+    margin-bottom: 0.75rem !important;
   }
   
   /* Avoid text getting too small */
@@ -75,8 +78,70 @@
   /* Default max-width for content */
   .container {
     width: 100%;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Improved section spacing */
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Content padding adjustments */
+  .content-padding {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Component spacing */
+  .text-center.mb-12 {
+    margin-bottom: 2rem !important;
+  }
+
+  .text-center.mb-16 {
+    margin-bottom: 2.5rem !important;
+  }
+
+  /* Card and grid spacing */
+  .grid {
+    gap: 1.5rem !important;
+  }
+
+  .glass-card {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* List spacing */
+  .space-y-2 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .space-y-3 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1.25rem !important;
+  }
+
+  /* Button spacing */
+  .btn-primary,
+  .btn-outline {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Form element spacing */
+  input,
+  select,
+  textarea {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Image spacing */
+  .aspect-w-4 {
+    margin-bottom: 1.5rem !important;
   }
 }
 
@@ -318,8 +383,8 @@
 /* Landscape mobile optimization */
 @media (max-width: 896px) and (orientation: landscape) {
   section {
-    padding-top: 3rem !important;
-    padding-bottom: 3rem !important;
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
   }
   
   body {

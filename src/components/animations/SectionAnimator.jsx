@@ -54,37 +54,31 @@ const SectionAnimator = memo(({
     <section 
       id={id} 
       ref={sectionRef}
-      className={`relative overflow-hidden ${className}`}
+      className={`relative overflow-hidden py-12 sm:py-16 md:py-20 ${className}`}
     >
       {/* Background element - only render if needed */}
       {backgroundClassName && (
         <div className={`absolute inset-0 -z-10 ${backgroundClassName}`} />
       )}
       
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto content-padding">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-4xl mx-auto">
           {/* Section header without animations */}
           {showTitle && title && (
-            <div className="text-center mb-12 md:mb-16">
+            <div className="text-center mb-8 sm:mb-12 md:mb-16">
               <h2 
-                className={`text-3xl md:text-4xl font-bold mb-4 ${titleClassName}`}
+                className={`text-3xl sm:text-4xl font-bold mb-3 sm:mb-4 ${titleClassName}`}
               >
                 {formattedTitle}
               </h2>
               
               {subtitle && (
                 <p 
-                  className={`text-gray-300 text-lg max-w-2xl mx-auto ${subtitleClassName}`}
+                  className={`text-gray-300 text-base sm:text-lg max-w-2xl mx-auto ${subtitleClassName}`}
                 >
                   {subtitle}
                 </p>
               )}
-              
-              {/* Removed underline
-              <div 
-                className="w-24 h-1 bg-primary/30 rounded-full mx-auto mt-6"
-              />
-              */}
             </div>
           )}
           
@@ -93,7 +87,7 @@ const SectionAnimator = memo(({
             style={{ 
               direction: dir
             }}
-            className={dir === 'rtl' ? 'rtl' : ''}
+            className={`space-y-6 sm:space-y-8 ${dir === 'rtl' ? 'rtl' : ''}`}
           >
             {children}
           </div>

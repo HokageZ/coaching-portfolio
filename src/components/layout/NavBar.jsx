@@ -456,6 +456,30 @@ const NavBar = () => {
             transition={{ duration: 0.5, ease: "easeOut" }}
           />
         )}
+
+        {/* Glowing line for landing section */}
+        {activeSection === 'home' && !isScrolled && (
+          <motion.div 
+            className="absolute bottom-0 left-0 w-full h-[3px] z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent"
+              style={{
+                boxShadow: '0 0 15px 2px rgba(182, 13, 13, 0.7), 0 0 25px 4px rgba(182, 13, 13, 0.5)'
+              }}
+            />
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent blur-sm"
+              style={{
+                boxShadow: '0 0 20px 3px rgba(182, 13, 13, 0.4)'
+              }}
+            />
+          </motion.div>
+        )}
       </motion.nav>
       
       {/* Mobile Menu */}

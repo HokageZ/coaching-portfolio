@@ -177,73 +177,12 @@ const ServiceCard = memo(({ service, index, hoveredCard, setHoveredCard }) => {
   );
 });
 
-// Enhanced CTA component
-const EnhancedCta = memo(({ t }) => (
-  <motion.div 
-    className="mt-16 text-center"
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3, delay: 0.2, ease: [0.4, 0, 0.2, 1] }}
-    viewport={{ once: true, margin: "-50px" }}
-    style={{ 
-      willChange: 'transform, opacity',
-      backfaceVisibility: 'hidden',
-      WebkitBackfaceVisibility: 'hidden',
-      touchAction: 'pan-y pinch-zoom'
-    }}
-  >
-    <motion.p 
-      className="text-gray-300 mb-6 max-w-2xl mx-auto"
-      animate={{ opacity: [0.9, 1, 0.9] }}
-      transition={{ duration: 4, repeat: Infinity }}
-      style={{ willChange: 'opacity' }}
-    >
-      {t('services.cta.looking')}
-    </motion.p>
-    <motion.div
-      className="inline-block"
-      whileHover={{ scale: 1.02 }}
-      style={{ 
-        willChange: 'transform',
-        backfaceVisibility: 'hidden',
-        WebkitBackfaceVisibility: 'hidden',
-        touchAction: 'pan-y pinch-zoom'
-      }}
-    >
-      <motion.a
-        href="#packages"
-        className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-lg font-bold py-4 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-        whileHover={{ scale: 1.02, backgroundColor: "#950B0B" }}
-        whileTap={{ scale: 0.98 }}
-        style={{ 
-          willChange: 'transform, background-color',
-          backfaceVisibility: 'hidden',
-          WebkitBackfaceVisibility: 'hidden',
-          touchAction: 'pan-y pinch-zoom'
-        }}
-        onClick={(e) => {
-          e.preventDefault();
-          const packages = document.getElementById('packages');
-          if (packages) {
-            packages.scrollIntoView({ behavior: 'smooth' });
-          }
-        }}
-      >
-        <span className="font-bold tracking-wide">{t('packages.title')}</span>
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </motion.a>
-    </motion.div>
-  </motion.div>
-));
-
 // Main Services component - optimized with memoization
 const Services = memo(() => {
-  const [hoveredCard, setHoveredCard] = useState(null);
   const { t } = useLanguage();
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const setHoveredCardCallback = useCallback((id) => setHoveredCard(id), []);
 
-  // Memoize services array to prevent recreation on re-renders
   const services = useMemo(() => [
     {
       id: 1,
@@ -284,11 +223,6 @@ const Services = memo(() => {
     }
   ], [t]);
   
-  // Optimization: Use a callback for hover state changes
-  const setHoveredCardCallback = useCallback((id) => {
-    setHoveredCard(id);
-  }, []);
-  
   return (
     <SectionAnimator 
       id="services"
@@ -297,8 +231,8 @@ const Services = memo(() => {
       subtitle={t('services.subtitle')}
       showPatterns={true}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 xl:gap-12">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
           {services.map((service, index) => (
             <ServiceCard 
               key={service.id}
@@ -312,7 +246,46 @@ const Services = memo(() => {
       </div>
       
       {/* Enhanced CTA */}
-      <EnhancedCta t={t} />
+      <div className="mt-10 sm:mt-12 md:mt-16 text-center">
+        <p className="text-gray-300 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
+          {t('services.cta.looking')}
+        </p>
+        <motion.div
+          className="inline-block"
+          whileHover={{ scale: 1.02 }}
+          style={{ 
+            willChange: 'transform',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
+            touchAction: 'pan-y pinch-zoom'
+          }}
+        >
+          <motion.a
+            href="#packages"
+            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-base sm:text-lg font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+            whileHover={{ scale: 1.02, backgroundColor: "#950B0B" }}
+            whileTap={{ scale: 0.98 }}
+            style={{ 
+              willChange: 'transform, background-color',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden',
+              touchAction: 'pan-y pinch-zoom'
+            }}
+            onClick={(e) => {
+              e.preventDefault();
+              const packages = document.getElementById('packages');
+              if (packages) {
+                packages.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            <span className="font-bold tracking-wide">{t('packages.title')}</span>
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </motion.a>
+        </motion.div>
+      </div>
     </SectionAnimator>
   );
 });
