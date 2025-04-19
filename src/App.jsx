@@ -1,13 +1,13 @@
-import { BrowserRouter as Router, Routes, Route, createRoutesFromElements } from 'react-router-dom';
 import { useEffect, createContext, useState, useCallback, useContext, useMemo, memo, Suspense, lazy } from 'react';
 import { useLanguage } from './context/LanguageContext';
 import { CardSkeleton } from './components/ui/Skeleton';
 import ErrorBoundary from './components/ui/ErrorBoundary';
-import StaticPatterns from './components/animations/AnimatedPatterns';
 import { Analytics } from "@vercel/analytics/react";
+import { useInView } from 'react-intersection-observer';
+import NavBar from './components/layout/NavBar';
+import useScrollSpy from './hooks/useScrollSpy';
 
 // Lazy load layout components
-const NavBar = lazy(() => import('./components/layout/NavBar'));
 const Footer = lazy(() => import('./components/layout/Footer'));
 
 // Lazy load UI components
@@ -98,8 +98,8 @@ const SectionContainer = memo(({ id, className = "", children }) => (
   </div>
 ));
 
-// Optimized Home component
-const Home = () => {
+// Main App component
+const App = memo(() => {
   const [isScrolling, setIsScrolling] = useState(false);
   const [visibleSections, setVisibleSections] = useState({
     // Initialize all sections as visible by default
@@ -131,79 +131,143 @@ const Home = () => {
     setVisibleSection
   }), [isScrolling, visibleSections, setVisibleSection]);
   
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Add intersection observer hooks for each section
+  const [heroRef, heroInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [aboutRef, aboutInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [servicesRef, servicesInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [transformationsRef, transformationsInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [testimonialsRef, testimonialsInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [packagesRef, packagesInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const [faqRef, faqInView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  const activeSection = useScrollSpy(['landing', 'about', 'services', 'transformations', 'packages', 'faq', 'footer']);
+
+  // Handle initial navigation from URL hash
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash) {
+      const element = document.getElementById(hash);
+      if (element) {
+        // Small delay to ensure proper scrolling after page load
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, []);
+
+  // Check if current path is the home page
+  const isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+
   return (
     <div className="scroll-smooth antialiased">
       <ScrollContext.Provider value={contextValue}>
         <Suspense fallback={<CardSkeleton />}>
           <FontPreload />
         </Suspense>
-        <Suspense fallback={<CardSkeleton />}>
-          <NavBar />
-        </Suspense>
-        <main id="main-content" className="min-h-screen bg-background">
-          <SectionContainer id="landing-section">
-            <SectionWrapper id="landing" fallbackMessage="Failed to load the landing section. Please refresh the page.">
-              <Landing />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="about-section">
-            <SectionWrapper id="about" fallbackMessage="Failed to load the about section. Please refresh the page.">
-              <About />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="services-section">
-            <SectionWrapper id="services" fallbackMessage="Failed to load the services section. Please refresh the page.">
-              <Services />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="transformations-section">
-            <SectionWrapper id="transformations" fallbackMessage="Failed to load the transformations section. Please refresh the page.">
-              <Transformations />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="feedback-section">
-            <SectionWrapper id="feedback" fallbackMessage="Failed to load the feedback section. Please refresh the page.">
-              <Feedback />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="packages-section">
-            <SectionWrapper id="packages" fallbackMessage="Failed to load the packages section. Please refresh the page.">
-              <Packages />
-            </SectionWrapper>
-          </SectionContainer>
-          
-          <SectionContainer id="faq-section">
-            <SectionWrapper id="faq" fallbackMessage="Failed to load the FAQ section. Please refresh the page.">
-              <FAQ />
-            </SectionWrapper>
-          </SectionContainer>
-        </main>
-        <Suspense fallback={<CardSkeleton />}>
-          <Footer />
-        </Suspense>
+
+        {isHomePage ? (
+          <>
+            <Suspense fallback={<CardSkeleton />}>
+              <NavBar activeSection={activeSection} />
+            </Suspense>
+            <main id="main-content" className="min-h-screen bg-background">
+              <SectionContainer id="landing-section">
+                <SectionWrapper id="landing" fallbackMessage="Failed to load the landing section. Please refresh the page.">
+                  <Landing />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="about-section">
+                <SectionWrapper id="about" fallbackMessage="Failed to load the about section. Please refresh the page.">
+                  <About />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="services-section">
+                <SectionWrapper id="services" fallbackMessage="Failed to load the services section. Please refresh the page.">
+                  <Services />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="transformations-section">
+                <SectionWrapper id="transformations" fallbackMessage="Failed to load the transformations section. Please refresh the page.">
+                  <Transformations />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="feedback-section">
+                <SectionWrapper id="feedback" fallbackMessage="Failed to load the feedback section. Please refresh the page.">
+                  <Feedback />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="packages-section">
+                <SectionWrapper id="packages" fallbackMessage="Failed to load the packages section. Please refresh the page.">
+                  <Packages />
+                </SectionWrapper>
+              </SectionContainer>
+              
+              <SectionContainer id="faq-section">
+                <SectionWrapper id="faq" fallbackMessage="Failed to load the FAQ section. Please refresh the page.">
+                  <FAQ />
+                </SectionWrapper>
+              </SectionContainer>
+            </main>
+            <Suspense fallback={<CardSkeleton />}>
+              <Footer />
+            </Suspense>
+          </>
+        ) : (
+          <Suspense fallback={<CardSkeleton />}>
+            <NotFound />
+          </Suspense>
+        )}
+
         <Suspense fallback={null}>
           <ScrollToTop />
         </Suspense>
+        <Analytics />
       </ScrollContext.Provider>
     </div>
-  );
-};
-
-// Memoized App component
-const App = memo(() => {
-  return (
-    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-      <Analytics />
-    </Router>
   );
 });
 

@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 
 const Footer = () => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [glowSocialLinks, setGlowSocialLinks] = useState(false);
+  const socialLinksRef = useRef(null);
+  const footerRef = useRef(null);
   const { t, dir, language } = useLanguage();
-  
+
   useEffect(() => {
     const handleScroll = () => {
       const position = window.pageYOffset;
@@ -19,64 +22,85 @@ const Footer = () => {
     };
   }, []);
   
+  // Handle all navigation to the footer section
+  useEffect(() => {
+    // Check if URL hash is #footer and properly scroll to it
+    if (window.location.hash === '#footer' && footerRef.current) {
+      setTimeout(() => {
+        // Use a slight delay to ensure proper scrolling after page loads
+        footerRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Update URL without triggering a scroll (maintains footer hash)
+        window.history.replaceState(null, null, '#footer');
+      }, 300);
+    }
+  }, []);
+  
   const handleScrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-  
-  const handleScrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const navbarHeight = document.querySelector('nav')?.offsetHeight || 0;
-      const padding = 20;
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - navbarHeight - padding;
+
+  const handleSmoothScroll = (e, targetId) => {
+    // Prevent default navigation behavior
+    e.preventDefault();
+    
+    const targetElement = document.getElementById(targetId);
+    
+    // Ensure the target element exists
+    if (targetElement) {
+      // Get target position
+      const targetRect = targetElement.getBoundingClientRect();
+      const absoluteTargetTop = window.pageYOffset + targetRect.top;
       
-      const duration = 800;
-      const start = window.pageYOffset;
-      const distance = offsetPosition - start;
-      const startTime = performance.now();
+      // Scroll to target with an offset to ensure it's clearly visible
+      window.scrollTo({
+        top: absoluteTargetTop - 50, // Offset to position properly
+        behavior: 'smooth'
+      });
       
-      function step(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeInOutCubic = progress < 0.5 
-          ? 4 * progress * progress * progress 
-          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-        
-        window.scrollTo(0, start + distance * easeInOutCubic);
-        
-        if (progress < 1) {
-          window.requestAnimationFrame(step);
-        }
-      }
-      
-      window.requestAnimationFrame(step);
-      
-      window.history.pushState(null, null, `#${id}`);
+      // Update URL without causing another scroll
+      window.history.pushState(null, null, `#${targetId}`);
     }
   };
-  
-  const scrollToPackages = () => {
-    handleScrollToSection('packages');
+
+  const handleContactClick = (e) => {
+    // Prevent default navigation behavior
+    e.preventDefault();
+    
+    // Ensure the footer element exists
+    if (footerRef.current) {
+      // Get footer position
+      const footerRect = footerRef.current.getBoundingClientRect();
+      const absoluteFooterTop = window.pageYOffset + footerRect.top;
+      
+      // Scroll to footer with an offset to ensure it's clearly visible
+      window.scrollTo({
+        top: absoluteFooterTop - 50, // Offset to position footer properly
+        behavior: 'smooth'
+      });
+      
+      // Update URL without causing another scroll
+      window.history.pushState(null, null, '#footer');
+    }
+    
+    // Trigger glow effect
+    setGlowSocialLinks(true);
+    
+    // Scroll to social links if on mobile
+    if (window.innerWidth < 768 && socialLinksRef.current) {
+      setTimeout(() => {
+        socialLinksRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+    }
+    
+    // Turn off glow after 3 seconds
+    setTimeout(() => {
+      setGlowSocialLinks(false);
+    }, 3000);
   };
-  
-  const navLinks = [
-    { name: t('nav.home'), url: "home", ariaLabel: "Navigate to home section" },
-    { name: t('nav.services'), url: "services", ariaLabel: "Learn about our services" },
-    { name: t('nav.transformations'), url: "transformations", ariaLabel: "See transformation stories" },
-    { name: t('nav.packages'), url: "packages", ariaLabel: "View our pricing packages" },
-    { name: t('nav.faq'), url: "faq", ariaLabel: "Frequently asked questions" }
-  ];
-  
-  const legalLinks = [
-    { name: t('footer.privacy'), url: "#" },
-    { name: t('footer.terms'), url: "#" },
-    { name: t('footer.cookies'), url: "#" }
-  ];
-  
+
   const socialLinks = [
     { name: "Instagram", url: "https://www.instagram.com/dr_fares_coaching", icon: "instagram" },
     { name: "TikTok", url: "https://www.tiktok.com/@faresrezk94", icon: "tiktok" },
@@ -120,171 +144,126 @@ const Footer = () => {
     }
   };
 
-  // Handle keyboard navigation in footer links
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.target.classList.contains('footer-nav-link') && (e.key === 'Enter' || e.key === ' ')) {
-        e.preventDefault();
-        const sectionId = e.target.getAttribute('data-section');
-        handleScrollToSection(sectionId);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
-  // Social Icon Card Component
-  const SocialIconCard = ({ link, index }) => {
-    const [isHovered, setIsHovered] = useState(false);
-    
-    return (
-      <a 
-        href={link.url}
-        className="relative"
-        target="_blank"
-        rel="noopener noreferrer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        aria-label={`Visit our ${link.name} page`}
-      >
-        {/* Glass Card Style */}
-        <div className="glass-card w-14 h-14 flex items-center justify-center rounded-xl overflow-hidden relative"
-          style={{
-            boxShadow: isHovered ? '0 10px 20px -5px rgba(182, 13, 13, 0.2)' : 'none'
-          }}
-        >
-          {/* Background glow effect */}
-          <div 
-            className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/0 via-primary/20 to-primary/0 z-0 blur-xl"
-            style={{ opacity: isHovered ? 0.7 : 0 }}
-          />
-          
-          {/* Card accent */}
-          <div 
-            className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/30 via-primary to-primary/30"
-            style={{ transform: isHovered ? 'scaleX(1)' : 'scaleX(0)' }}
-          />
-          
-          {/* Icon Container */}
-          <div 
-            className="relative z-10"
-            style={{ 
-              transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-              color: isHovered ? '#B60D0D' : '#ffffff'
-            }}
-          >
-            <SocialIcon type={link.icon} />
-          </div>
-          
-          {/* Corner accent */}
-          <div 
-            className="absolute bottom-0 right-0 w-6 h-6 z-0 opacity-20"
-            style={{ 
-              background: 'radial-gradient(circle at bottom right, rgba(182, 13, 13, 0.5), transparent 70%)',
-              opacity: isHovered ? 0.4 : 0.1,
-              transform: isHovered ? 'scale(1.2)' : 'scale(1)'
-            }}
-          />
-        </div>
-      </a>
-    );
-  };
+  // Quick Links
+  const quickLinks = [
+    { name: t('nav.home'), url: "#landing", onClick: (e) => handleSmoothScroll(e, "landing") },
+    { name: t('nav.about'), url: "#about", onClick: (e) => handleSmoothScroll(e, "about") },
+    { name: t('nav.services'), url: "#services", onClick: (e) => handleSmoothScroll(e, "services") },
+    { name: t('nav.transformations'), url: "#transformations", onClick: (e) => handleSmoothScroll(e, "transformations") },
+    { name: t('nav.feedback'), url: "#feedback", onClick: (e) => handleSmoothScroll(e, "feedback") },
+    { name: t('nav.packages'), url: "#packages", onClick: (e) => handleSmoothScroll(e, "packages") },
+    { name: t('nav.faq'), url: "#faq", onClick: (e) => handleSmoothScroll(e, "faq") },
+    { name: t('nav.contact'), url: "#footer", onClick: handleContactClick }
+  ];
 
   return (
-    <footer id="footer" className="relative overflow-hidden bg-black">
-      {/* Modern glass/blur overlay */}
-      <div className="absolute inset-0 bg-black z-0"></div>
+    <footer 
+      id="footer" 
+      ref={footerRef}
+      className="relative overflow-hidden bg-gradient-to-b from-black to-black/95 mt-32 pt-16 pb-6" 
+      style={{ direction: 'ltr' }}
+    >
+      {/* Visual separator from FAQ section - a decorative element */}
+      <div className="absolute top-0 left-0 right-0 transform -translate-y-16">
+        <div className="h-16 w-full bg-gradient-to-b from-transparent to-black/40"></div>
+        <div className="w-40 h-1 mx-auto -mt-8 bg-primary/30 blur-sm rounded-full"></div>
+      </div>
       
-      {/* Glowing red line at top */}
+      {/* Glowing red accent line at top */}
       <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_10px_rgba(182,13,13,0.5)]"></div>
       
-      {/* Dynamic grid pattern */}
-      <div className="absolute inset-0 z-0 opacity-8" 
+      {/* Subtle grid pattern overlay */}
+      <div className="absolute inset-0 z-0 opacity-10" 
         style={{ 
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px)`, 
-          backgroundSize: '30px 30px',
+          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)`, 
+          backgroundSize: '25px 25px',
           backgroundPosition: 'center center'
         }}
       />
       
-      {/* Red accent lighting effects - stronger look */}
-      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-full h-40 bg-primary/40 rounded-full blur-[120px] opacity-50"></div>
+      {/* Ambient glow effect */}
+      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-full h-40 bg-primary/30 rounded-full blur-[120px] opacity-40"></div>
       
-      <div className="container mx-auto px-6 relative z-10 py-10">
-        {/* Main content area */}
-        <div className="flex flex-col items-center">
-          {/* Logo with shadow effect - Completely independent of language context */}
-          <div 
-            className="mb-6 text-center brand-name english-text ltr dr-fares-coaching-container"
-            style={{ 
-              direction: 'ltr',
-              fontFamily: 'var(--font-english) !important'
-            }}
-            lang="en"
-            dir="ltr"
-          >
-            <h2 
-              className="text-4xl font-bold tracking-wide leading-none dr-fares-title font-english" 
-              lang="en" 
-              dir="ltr"
-              style={{ fontFamily: 'var(--font-english) !important' }}
+      <div className="container mx-auto px-6 relative z-10 pb-4">
+        {/* Two-column layout for footer */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8">
+          {/* Left column: Social Media */}
+          <div className="flex flex-col items-center md:items-start">
+            {/* Social media links stacked vertically */}
+            <div 
+              ref={socialLinksRef}
+              className={`grid grid-cols-1 gap-y-3 w-full transition-all duration-500 ${glowSocialLinks ? 'scale-105' : ''}`}
             >
-              <span 
-                className="text-primary drop-shadow-[0_0_8px_rgba(182,13,13,0.3)] mr-2 dr-text"
-                style={{ fontFamily: 'var(--font-english) !important' }}
-              >
-                DR
-              </span> 
-              <span 
-                className="text-white fares-text"
-                style={{ fontFamily: 'var(--font-english) !important' }}
-              >
-                FARES
-              </span>
-            </h2>
-            <p 
-              className="text-white/80 text-lg font-light mt-1 tracking-wider coaching-text font-english" 
-              lang="en" 
-              dir="ltr"
-              style={{ fontFamily: 'var(--font-english) !important' }}
-            >
-              COACHING
-            </p>
-          </div>
-          
-          {/* Social Media Icons - Glass Card Style */}
-          <div className="flex flex-col items-center mb-4">
-            <p className={`text-gray-400 text-sm font-light mb-4 ${language === 'en' ? 'font-english' : ''}`} 
-               style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>{t('footer.connect')}</p>
-            <div className="flex justify-center gap-4">
-              {socialLinks.map((link, index) => {
-                return (
-                  <SocialIconCard key={index} link={link} index={index} />
-                );
-              })}
+              {socialLinks.map((link, index) => (
+                <a 
+                  key={index}
+                  href={link.url}
+                  className={`
+                    text-gray-400 hover:text-primary transition-colors duration-300 
+                    hover:translate-x-1 transform transition-transform flex items-center gap-2
+                    ${glowSocialLinks ? 'text-primary animate-pulse' : ''}
+                  `}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit our ${link.name} page`}
+                  style={{ direction: 'ltr' }}
+                >
+                  <span className={`transition-colors duration-300 ${glowSocialLinks ? 'text-primary' : 'text-white'}`}>
+                    <SocialIcon type={link.icon} />
+                  </span>
+                  <span>{link.name}</span>
+                </a>
+              ))}
             </div>
           </div>
           
-          {/* Copyright */}
-          <div className="text-center text-gray-600 text-sm">
-            <span className={`${language === 'en' ? 'font-english' : ''}`} style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
-              &copy; {new Date().getFullYear()} 
-            </span> 
-            <span className="font-english ltr dr-fares-coaching-text brand-name" style={{ direction: 'ltr', display: 'inline-block' }} lang="en">
-              DR FARES COACHING
-            </span>
-            <span className={`${language === 'en' ? 'font-english' : ''}`} style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
-              . {t('footer.rights')}
-            </span>
+          {/* Right column: Quick links without title */}
+          <div className="flex flex-col items-center md:items-end">
+            <div className="grid grid-cols-2 gap-x-10 gap-y-3" style={{ direction: 'ltr' }}>
+              {quickLinks.map((link, index) => (
+                <a 
+                  key={index} 
+                  href={link.url} 
+                  onClick={link.onClick}
+                  className="text-gray-400 hover:text-primary transition-colors duration-300 hover:translate-x-1 transform transition-transform"
+                  style={{ direction: 'ltr', textAlign: language === 'ar' ? 'right' : 'left' }}
+                >
+                  {link.name}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
+        
+        {/* Divider */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent my-6"></div>
+        
+        {/* Copyright */}
+        <div className="text-center text-gray-600 text-sm" style={{ direction: 'ltr' }}>
+          <span>
+            &copy; {new Date().getFullYear()} 
+          </span> 
+          <span 
+            className="mx-1" 
+            style={{ 
+              fontFamily: "'Chakra Petch', system-ui, sans-serif",
+              direction: 'ltr',
+              display: 'inline-block'
+            }} 
+            lang="en"
+          >
+            DR FARES COACHING
+          </span>
+          <span>
+            . {t('footer.rights')}
+          </span>
+        </div>
       </div>
-      
-      {/* Back to top button - Premium Glass Style */}
+
+      {/* Back to top button - Glass style */}
       {showScrollButton && (
         <button
-          className="fixed bottom-6 right-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white z-50 overflow-hidden group"
+          className="fixed bottom-6 right-6 w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white z-50 overflow-hidden group transition-all duration-300 hover:scale-110"
           onClick={handleScrollToTop}
           aria-label="Back to top"
         >
@@ -293,6 +272,7 @@ const Footer = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
             </svg>
           </div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
         </button>
       )}
     </footer>

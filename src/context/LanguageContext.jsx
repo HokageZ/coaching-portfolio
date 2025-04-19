@@ -66,10 +66,13 @@ export const LanguageProvider = ({ children }) => {
       document.body.classList.toggle('ltr', language === 'en');
       
       // Force font application for branding elements
-      const brandingElements = document.querySelectorAll('.brand-name, .dr-text, .fares-text, .coaching-text, .dr-fares-coaching-container, .dr-fares-title');
+      const brandingElements = document.querySelectorAll('.brand-name, .dr-text, .fares-text, .coaching-text, .dr-fares-coaching-container, .dr-fares-title, .logo-area, .logo-area *');
       brandingElements.forEach(el => {
-        el.style.fontFamily = 'var(--font-english)';
+        el.style.fontFamily = "'Chakra Petch', system-ui, sans-serif";
         el.style.direction = 'ltr';
+        // Add !important flag by setting priority
+        el.style.setProperty('font-family', "'Chakra Petch', system-ui, sans-serif", 'important');
+        el.style.setProperty('direction', 'ltr', 'important');
       });
     }
   }, [language]);

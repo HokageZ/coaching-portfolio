@@ -1,142 +1,180 @@
-import { useState, useContext, useEffect, memo, useMemo, useCallback } from 'react';
-import { ScrollContext } from '../../App';
-import SectionAnimator from '../animations/SectionAnimator';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 import { useLanguage } from '../../context/LanguageContext';
 
-// Further optimized FAQItem with useCallback for toggle
-const FAQItem = memo(({ faq, index }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  
-  // Use callback to prevent recreating function on every render
-  const toggleOpen = useCallback(() => {
-    setIsOpen(prev => !prev);
-  }, []);
-  
-  const panelId = `faq-panel-${index}`;
-  const buttonId = `faq-button-${index}`;
-  
-  // Precalculate styles to avoid object recreation in render
-  const panelStyle = {
-    maxHeight: isOpen ? '1000px' : '0',
-    opacity: isOpen ? 1 : 0,
-    transform: 'translateZ(0)',
-    willChange: 'max-height, opacity'
-  };
-  
-  const iconClass = `w-6 h-6 min-w-[24px] text-primary transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`;
-  const titleClass = `text-lg sm:text-xl font-semibold transition-colors duration-300 ${isOpen ? 'text-primary' : 'text-white'}`;
-  
-  return (
-    <div className="mb-4 last:mb-0">
-      <button 
-        id={buttonId}
-        onClick={toggleOpen}
-        className="w-full flex justify-between items-start p-4 rounded-lg bg-black/20 hover:bg-black/40 backdrop-blur-sm border border-white/10 transition-all duration-300"
-        aria-expanded={isOpen}
-        aria-controls={panelId}
-        aria-label={`${faq.question} ${isOpen ? 'Collapse' : 'Expand'}`}
-      >
-        <span className={titleClass}>{faq.question}</span>
-        <svg 
-          className={iconClass} 
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-          aria-hidden="true"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-      <div 
-        id={panelId}
-        role="region"
-        aria-labelledby={buttonId}
-        className={`overflow-hidden transition-all duration-500 ease-in-out ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
-        style={panelStyle}
-      >
-        <div className="p-4 pt-2 text-gray-300 bg-black/10 rounded-b-lg border-t-0 border border-white/5">
-          {faq.answer}
-        </div>
-      </div>
-    </div>
-  );
-});
+const faqVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.43, 0.13, 0.23, 0.96],
+    },
+  },
+};
 
-// Main FAQ component
+const contentVariants = {
+  hidden: {
+    opacity: 0,
+    height: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.43, 0.13, 0.23, 0.96],
+    },
+  },
+  visible: {
+    opacity: 1,
+    height: 'auto',
+    transition: {
+      duration: 0.4,
+      ease: [0.43, 0.13, 0.23, 0.96],
+    },
+  },
+};
+
 const FAQ = () => {
+  const [activeIndex, setActiveIndex] = useState(null);
+  const [ref, inView] = useInView({
+    threshold: 0.1,
+    triggerOnce: true,
+  });
   const { t } = useLanguage();
-  
-  // Memoize FAQ data to prevent recalculation
-  const faqs = useMemo(() => [
-    { 
-      id: 'faq1', 
+
+  const faqs = [
+    {
       question: t('faq.q1'),
       answer: t('faq.a1')
     },
-    { 
-      id: 'faq2', 
+    {
       question: t('faq.q2'),
       answer: t('faq.a2')
     },
-    { 
-      id: 'faq3', 
+    {
       question: t('faq.q3'),
       answer: t('faq.a3')
     },
-    { 
-      id: 'faq4', 
+    {
       question: t('faq.q4'),
       answer: t('faq.a4')
     },
-    { 
-      id: 'faq5', 
+    {
       question: t('faq.q5'),
       answer: t('faq.a5')
     },
-    { 
-      id: 'faq6', 
+    {
       question: t('faq.q6'),
       answer: t('faq.a6')
     },
-    { 
-      id: 'faq7', 
+    {
       question: t('faq.q7'),
       answer: t('faq.a7')
     }
-  ], [t]);
+  ];
+
+  const handleKeyPress = (event, index) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setActiveIndex(activeIndex === index ? null : index);
+    }
+  };
 
   return (
-    <section id="faq" className="relative overflow-hidden bg-black">
-      {/* Modern glass/blur overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black to-black/95 backdrop-blur-sm z-0"></div>
-      
-      {/* Dynamic grid pattern */}
-      <div className="absolute inset-0 z-0 opacity-8" 
-        style={{ 
-          backgroundImage: `radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px)`, 
-          backgroundSize: '30px 30px',
-          backgroundPosition: 'center center'
-        }}
-      />
-      
-      <div className="container relative z-10 mx-auto px-4">
-        <div className="py-24">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{t('faq.title')}</h2>
-            <p className="text-gray-300 max-w-3xl mx-auto">{t('faq.subtitle')}</p>
-          </div>
+    <section ref={ref} id="faq" className="relative py-16 bg-black">
+      <div className="container mx-auto px-6 max-w-4xl relative z-10">
+        <div className="text-center mb-16">
+          <motion.h2
+            initial={{ opacity: 0, y: -20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-4xl font-bold mb-6 text-white"
+          >
+            {t('faq.title')}
+          </motion.h2>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="text-gray-400 text-lg max-w-2xl mx-auto"
+          >
+            {t('faq.subtitle')}
+          </motion.p>
+        </div>
 
-          <div className="max-w-3xl mx-auto">
-            <div className="space-y-6">
-              {faqs.map((faq, index) => (
-                <FAQItem 
-                  key={faq.id} 
-                  faq={faq} 
-                  index={index}
-                />
-              ))}
-            </div>
-          </div>
+        <div className="space-y-4">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={index}
+              variants={faqVariants}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              transition={{ delay: index * 0.15 }}
+              onClick={() => setActiveIndex(activeIndex === index ? null : index)}
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              tabIndex={0}
+              role="button"
+              aria-expanded={activeIndex === index}
+              aria-controls={`faq-content-${index}`}
+              className={`
+                bg-zinc-900/80 rounded-lg p-6 cursor-pointer
+                transition-all duration-300 ease-in-out
+                border border-zinc-800
+                hover:border-red-800 hover:bg-zinc-900
+                focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-opacity-50
+                transform hover:scale-[1.01]
+                ${activeIndex === index ? 'border-red-800 bg-zinc-900' : ''}
+              `}
+            >
+              <div className="flex justify-between items-center">
+                <h3 className={`text-lg font-semibold transition-colors duration-300 ${
+                  activeIndex === index ? 'text-red-600' : 'text-white'
+                }`}>
+                  {faq.question}
+                </h3>
+                <motion.div
+                  animate={{ rotate: activeIndex === index ? 45 : 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className={`w-5 h-5 relative ${
+                    activeIndex === index ? 'text-red-600' : 'text-gray-400'
+                  }`}
+                >
+                  <svg
+                    className="absolute inset-0 transition-colors duration-300"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                </motion.div>
+              </div>
+
+              <AnimatePresence mode="wait">
+                {activeIndex === index && (
+                  <motion.div
+                    id={`faq-content-${index}`}
+                    variants={contentVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    className="mt-4 text-gray-400 overflow-hidden"
+                  >
+                    <div className="pt-2">
+                      {faq.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

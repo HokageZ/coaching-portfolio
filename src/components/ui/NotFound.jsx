@@ -1,37 +1,27 @@
-import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
 
 const NotFound = () => {
   const { t } = useLanguage();
   
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="max-w-lg w-full text-center">
-        <h1 className="text-9xl font-bold text-primary mb-4">{t('notfound.title')}</h1>
-        <h2 className="text-4xl font-bold text-white mb-4">{t('notfound.subtitle')}</h2>
-        <p className="text-gray-400 mb-8">
-          {t('notfound.description')}
-        </p>
-        <Link
-          to="/"
-          className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-red-700 transition-colors duration-300"
+    <div className="min-h-screen flex flex-col items-center justify-center p-5 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-md"
+      >
+        <h1 className="text-5xl font-bold mb-4 text-primary">404</h1>
+        <h2 className="text-2xl font-semibold mb-6">{t('notFound.title')}</h2>
+        <p className="mb-8 text-gray-300">{t('notFound.message')}</p>
+        <a
+          href="/"
+          className="px-5 py-2.5 bg-primary text-white rounded shadow-lg hover:bg-primary-dark transition duration-300"
         >
-          <svg
-            className="w-5 h-5 mr-2"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          {t('notfound.backhome')}
-        </Link>
-      </div>
+          {t('notFound.returnHome')}
+        </a>
+      </motion.div>
     </div>
   );
 };

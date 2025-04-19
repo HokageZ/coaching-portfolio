@@ -1,29 +1,28 @@
-# Coach Portfolio Website
+# DR FARES COACHING - Portfolio Website
 
-A modern, responsive portfolio website for an online coach built with React and Tailwind CSS.
+A modern, responsive portfolio website for an online fitness coach built with React, Tailwind CSS, and Framer Motion. Featuring bilingual support for English and Arabic with RTL layout.
 
 ## Features
 
 - 🎨 Modern, minimal design with dark theme
 - 📱 Fully responsive layout
-- 🎯 Sections for services, packages, and testimonials
-- 📝 Blog and resources section
-- 📅 Booking system for coaching sessions
-- 📧 Contact form with validation
-- ⚡ Fast and optimized performance
+- 🎯 Sections for services, transformations, and testimonials
+- 📝 Detailed information about coaching services
+- 💰 Pricing packages with features comparison
+- ❓ FAQ section with expandable answers
+- 📊 Client transformation showcases
 - 🌐 Bilingual support with full English and Arabic translations
 - 📦 RTL (Right-to-Left) layout support for Arabic
-- 🖋 Enhanced typography with specialized Arabic font (29LT Bukra)
-- 🔍 Accessibility features for screen readers
+- 🖋 Enhanced typography with specialized fonts
+- 🔍 Accessibility features
+- ⚡ Performance optimized with code splitting and lazy loading
 
 ## Tech Stack
 
 - React 18
-- React Router v6
 - Tailwind CSS
 - Framer Motion
-- React Hook Form
-- Yup
+- React Intersection Observer
 - Vite
 
 ## Getting Started
@@ -37,8 +36,8 @@ A modern, responsive portfolio website for an online coach built with React and 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/coach-portfolio.git
-cd coach-portfolio
+git clone https://github.com/yourusername/dr-fares-coaching.git
+cd dr-fares-coaching
 ```
 
 2. Install dependencies:
@@ -70,59 +69,60 @@ The build files will be in the `dist` directory.
 ## Project Structure
 
 ```
-coach-portfolio/
+dr-fares-coaching/
 ├── public/
 │   ├── favicon.svg
 │   └── assets/
 ├── src/
+│   ├── assets/           # Images and static assets
 │   ├── components/
-│   │   ├── About.jsx
-│   │   ├── Blog.jsx
-│   │   ├── Booking.jsx
-│   │   ├── ContactForm.jsx
-│   │   ├── Credibility.jsx
-│   │   ├── FAQ.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Landing.jsx
-│   │   ├── NavBar.jsx
-│   │   ├── NotFound.jsx
-│   │   ├── Packages.jsx
-│   │   ├── Services.jsx
-│   │   ├── Testimonials.jsx
-│   │   └── Transformations.jsx
-│   ├── App.jsx
-│   ├── main.jsx
-│   └── index.css
-├── index.html
-├── package.json
-├── tailwind.config.js
-└── vite.config.js
+│   │   ├── animations/   # Animation components
+│   │   ├── layout/       # Layout components (Navbar, Footer, etc.)
+│   │   ├── sections/     # Main page sections
+│   │   └── ui/           # Reusable UI components
+│   ├── constants/        # Constants and configuration
+│   ├── context/          # React context providers
+│   ├── hooks/            # Custom React hooks
+│   ├── styles/           # Global styles and Tailwind utilities
+│   ├── utils/            # Utility functions
+│   ├── App.jsx           # Main application component
+│   └── main.jsx          # Entry point
+├── index.html            # HTML template
+├── package.json          # Dependencies and scripts
+├── tailwind.config.js    # Tailwind configuration
+└── vite.config.js        # Vite configuration
 ```
+
+## Component Organization
+
+### Layout Components
+- `NavBar.jsx` - Main navigation with smooth scrolling
+- `Footer.jsx` - Footer with social links and quick navigation
+- `HeaderLogo.jsx` - Brand logo with animations
+- `MobileMenu.jsx` - Responsive menu for mobile devices
+
+### Section Components
+- `Landing.jsx` - Hero section with introduction
+- `About.jsx` - About the coach
+- `Services.jsx` - Description of coaching services
+- `Transformations.jsx` - Client before/after showcases
+- `Feedback.jsx` - Client testimonials
+- `Packages.jsx` - Pricing packages
+- `FAQ.jsx` - Frequently asked questions
+
+### UI Components
+- `Button.jsx` - Reusable button component
+- `Card.jsx` - Card component for various content
+- `ScrollToTop.jsx` - Scroll to top functionality
+- `Skeleton.jsx` - Loading placeholders
+- `ErrorBoundary.jsx` - Error handling component
 
 ## Customization
 
-1. Update the content in each component to match your needs
+1. Update the content in each section component
 2. Modify the color scheme in `tailwind.config.js`
-3. Replace placeholder images in the `public/assets` directory
+3. Replace placeholder images in the `src/assets` directory
 4. Update meta tags in `index.html`
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Icons from [Heroicons](https://heroicons.com/)
-- Images from [Unsplash](https://unsplash.com/)
-- Fonts from [Google Fonts](https://fonts.google.com/)
 
 ## Language Support
 
@@ -130,20 +130,23 @@ The site fully supports both English and Arabic languages:
 
 - Complete translation system using React Context
 - RTL layout switching
-- Arabic typography using 29LT Bukra font (see [Font Installation](./FONT_INSTALLATION.md))
+- Specialized typography for Arabic content
 - Proper text spacing and alignment for Arabic content
 
-## Installation
+## Performance Optimizations
 
-1. Clone the repository
-2. Install dependencies with `npm install`
-3. Start the development server with `npm run dev`
-4. For Arabic font support, follow the instructions in [FONT_INSTALLATION.md](./FONT_INSTALLATION.md)
+- Lazy loading of sections and components
+- Image optimization
+- CSS performance enhancements
+- Smooth scrolling and animations optimized for performance
+- Intersection Observer for scroll-based animations
 
-## Technologies Used
+## License
 
-- React
-- Vite
-- Tailwind CSS
-- Framer Motion
-- React Router DOM
+This project is licensed under the MIT License.
+
+## Acknowledgments
+
+- Icons from [Heroicons](https://heroicons.com/)
+- Images provided by Dr. Fares Coaching
+- Fonts from Google Fonts

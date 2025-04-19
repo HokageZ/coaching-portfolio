@@ -3,10 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import HeaderLogo from './HeaderLogo';
 import { useLanguage } from '../../context/LanguageContext';
 
-const NavBar = () => {
+const NavBar = ({ activeSection }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
   const [prevScrollY, setPrevScrollY] = useState(0);
   const [isNavVisible, setIsNavVisible] = useState(true);
   const { language, setLanguage, t } = useLanguage();
@@ -15,23 +14,61 @@ const NavBar = () => {
   const ticking = useRef(false);
   const scrollTimer = useRef(null);
   const sectionRefs = useRef([]);
+  const menuRef = useRef(null);
+  const [windowWidth, setWindowWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 0
+  );
+
+  // Update window width state on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      if (window.innerWidth >= 768) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      setWindowWidth(window.innerWidth);
+      window.addEventListener('resize', handleResize);
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
+  const isMobile = windowWidth < 768;
 
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     }
 
     return () => {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+    };
+  }, [isMobileMenuOpen]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target) && !event.target.closest('button[aria-label="Close menu"]')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isMobileMenuOpen]);
 
@@ -41,6 +78,7 @@ const NavBar = () => {
       .filter(section => section.getAttribute('id'));
   }, []);
 
+  // Optimized scroll handler with debounce for better mobile performance
   const handleScroll = useCallback(() => {
     if (scrollTimer.current) clearTimeout(scrollTimer.current);
 
@@ -48,11 +86,11 @@ const NavBar = () => {
       requestAnimationFrame(() => {
         const scrollY = window.scrollY;
         
-        // Hide/show navbar on scroll with debounce
+        // Hide/show navbar on scroll with reduced sensitivity for mobile
         if (scrollY > 300) {
-          if (scrollY > prevScrollY + 15 && !isMobileMenuOpen) {
+          if (scrollY > prevScrollY + 30 && !isMobileMenuOpen) {
             setIsNavVisible(false);
-          } else if (scrollY < prevScrollY - 5 || isMobileMenuOpen) {
+          } else if (scrollY < prevScrollY - 15 || isMobileMenuOpen) {
             setIsNavVisible(true);
           }
         } else {
@@ -62,7 +100,7 @@ const NavBar = () => {
         setPrevScrollY(scrollY);
         setIsScrolled(scrollY > 20);
       
-        // Detect which section is in view
+        // Detect which section is in view with less frequent updates on mobile
         scrollTimer.current = setTimeout(() => {
           const viewportHeight = window.innerHeight;
           const scrollPosition = window.pageYOffset;
@@ -81,8 +119,13 @@ const NavBar = () => {
             const visibleBottom = Math.min(scrollBottom, sectionBottom);
             const visibleArea = Math.max(0, visibleBottom - visibleTop);
             
+            // Enhanced visibility calculation with top proximity bonus and scroll direction consideration
             const topProximityBonus = Math.max(0, 1 - (Math.abs(scrollPosition - sectionTop) / viewportHeight));
-            const weightedVisibleArea = visibleArea * (1 + topProximityBonus);
+            const scrollDirectionBonus = scrollY > prevScrollY ? 
+              Math.max(0, 1 - (sectionBottom - scrollPosition) / viewportHeight) : 
+              Math.max(0, 1 - (scrollBottom - (scrollPosition + viewportHeight)) / viewportHeight);
+            
+            const weightedVisibleArea = visibleArea * (1 + topProximityBonus + scrollDirectionBonus * 0.5);
             
             if (weightedVisibleArea > maxVisibleArea) {
               maxVisibleArea = weightedVisibleArea;
@@ -90,18 +133,26 @@ const NavBar = () => {
             }
           });
           
-          if (currentSectionId && currentSectionId !== activeSection) {
-            setActiveSection(currentSectionId);
-            window.history.replaceState(null, null, `#${currentSectionId}`);
+          // Update active section and URL hash if we have a valid section
+          if (currentSectionId) {
+            if (currentSectionId !== activeSection) {
+              setIsMobileMenuOpen(false);
+            }
+            
+            // Always update URL hash to match current section
+            const currentHash = window.location.hash.substring(1);
+            if (currentHash !== currentSectionId) {
+              window.history.replaceState(null, null, `#${currentSectionId}`);
+            }
           }
-        }, 100);
+        }, isMobile ? 200 : 100); // Less frequent updates on mobile
         
         ticking.current = false;
       });
       
       ticking.current = true;
     }
-  }, [activeSection, isMobileMenuOpen, prevScrollY]);
+  }, [activeSection, isMobile, isMobileMenuOpen, prevScrollY]);
 
   useEffect(() => {
     scrollHandlerRef.current = handleScroll;
@@ -123,7 +174,7 @@ const NavBar = () => {
       if (element) {
         setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
-          setActiveSection(hash);
+          setIsMobileMenuOpen(false);
         }, 500);
       }
     }
@@ -131,23 +182,29 @@ const NavBar = () => {
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
-    if (element) {
-      const navHeight = navRef.current?.offsetHeight || 0;
-      const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
-      const offsetPosition = elementPosition - navHeight;
-
+    if (element || id === 'home') {
       // First close the mobile menu
       setIsMobileMenuOpen(false);
       
       // Wait for the menu to close before scrolling
       setTimeout(() => {
-        window.scrollTo({
-          top: id === 'footer' ? document.body.scrollHeight : offsetPosition,
-          behavior: 'smooth'
-        });
+        if (id === 'home') {
+          window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+          });
+        } else {
+          const navHeight = navRef.current?.offsetHeight || 0;
+          const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+          const offsetPosition = elementPosition - navHeight;
+
+          window.scrollTo({
+            top: id === 'footer' ? document.body.scrollHeight : offsetPosition,
+            behavior: 'smooth'
+          });
+        }
         
         window.history.pushState(null, null, `#${id}`);
-        setActiveSection(id);
       }, 300); // Wait for the menu animation to complete
     }
   };
@@ -223,10 +280,6 @@ const NavBar = () => {
         aria-label={`Navigate to ${item.label} section`}
         aria-current={activeSection === item.id ? 'page' : undefined}
         data-section={item.id}
-        tabIndex={!isMobile ? 0 : undefined}
-        onKeyDown={!isMobile ? (e) => {
-          if (e.key === 'Enter' || e.key === ' ') scrollToSection(item.id);
-        } : undefined}
       >
         {isMobile ? (
           <>
@@ -266,7 +319,7 @@ const NavBar = () => {
     
     return (
       <motion.button
-        onClick={toggleLanguage}
+        onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
         className={classes}
         initial={anim.initial}
         animate={anim.animate}
@@ -296,46 +349,13 @@ const NavBar = () => {
             </svg>
           </div>
         )}
-        <motion.div 
-          className={`absolute inset-0 ${isMobile ? 'bg-primary/5' : 'bg-primary/10'} z-0`}
-          initial={{ x: language === 'en' ? '100%' : '-100%' }}
-          animate={{ x: 0 }}
-          transition={{ duration: 0.3 }}
-        />
       </motion.button>
     );
   };
 
   const toggleMobileMenu = () => {
-    if (!isMobileMenuOpen) {
-      // Store current scroll position
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.overflow = 'hidden';
-    } else {
-      // Restore scroll position
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.overflow = '';
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-  // Cleanup effect for mobile menu
-  useEffect(() => {
-    return () => {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.overflow = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY) * -1);
-      }
-    };
-  }, []);
 
   return (
     <>
@@ -353,76 +373,23 @@ const NavBar = () => {
       >
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-14">
-            {/* Logo */}
-            <motion.div
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ 
-                delay: 0.3,
-                duration: 0.8,
-                type: "spring",
-                stiffness: 100
-              }}
-            >
-              <HeaderLogo isScrolled={isScrolled} />
-            </motion.div>
-            
-            {/* Skip to content link for accessibility */}
-            <a 
-              href="#main-content" 
-              className="sr-only focus:not-sr-only focus:absolute focus:top-20 focus:left-1/2 focus:transform focus:-translate-x-1/2 focus:bg-primary focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:z-50"
-            >
-              Skip to main content
-            </a>
-            
-            {/* Navigation Links - Desktop */}
+          <HeaderLogo />
+          
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ 
-                    delay: 0.4 + index * 0.1,
-                    duration: 0.5,
-                    type: "spring",
-                    stiffness: 100
-                  }}
-                >
-                  <NavItem item={item} index={index} isMobile={false} />
-                </motion.div>
+                <NavItem key={item.id} item={item} index={index} isMobile={false} />
               ))}
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ 
-                  delay: 0.4 + navItems.length * 0.1,
-                  duration: 0.5,
-                  type: "spring",
-                  stiffness: 100
-                }}
-              >
                 <LanguageToggle isMobile={false} />
-              </motion.div>
             </div>
 
             {/* Mobile Menu Button */}
             <motion.button 
-              onClick={toggleMobileMenu}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden relative z-50 flex items-center justify-center w-10 h-10 rounded-full overflow-hidden bg-primary/10 border border-primary/10"
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ 
-                delay: 0.6,
-                duration: 0.5,
-                type: "spring",
-                stiffness: 100
-              }}
               whileTap={{ scale: 0.95 }}
-              style={{ marginRight: '-4px' }}
             >
               <span className="sr-only">{isMobileMenuOpen ? "Close menu" : "Open menu"}</span>
               <div className="w-5 h-5 flex flex-col items-center justify-center">
@@ -443,49 +410,15 @@ const NavBar = () => {
                 ></span>
               </div>
             </motion.button>
-          </div>
         </div>
-
-        {/* Interactive background indicator */}
-        {isScrolled && (
-          <motion.div 
-            className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"
-            aria-hidden="true"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-          />
-        )}
-
-        {/* Glowing line for landing section */}
-        {activeSection === 'home' && !isScrolled && (
-          <motion.div 
-            className="absolute bottom-0 left-0 w-full h-[3px] z-10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent"
-              style={{
-                boxShadow: '0 0 15px 2px rgba(182, 13, 13, 0.7), 0 0 25px 4px rgba(182, 13, 13, 0.5)'
-              }}
-            />
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-transparent via-primary to-transparent blur-sm"
-              style={{
-                boxShadow: '0 0 20px 3px rgba(182, 13, 13, 0.4)'
-              }}
-            />
-          </motion.div>
-        )}
+      </div>
       </motion.nav>
       
       {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
+            ref={menuRef}
             id="mobile-menu"
             className="fixed inset-0 bg-black/95 backdrop-blur-lg z-40 flex flex-col md:hidden ltr"
             initial={{ opacity: 0, x: '100%' }}
@@ -493,6 +426,7 @@ const NavBar = () => {
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'tween', duration: 0.3 }}
             role="dialog"
+            aria-modal="true"
             aria-label="Mobile navigation menu"
             style={{ direction: 'ltr' }}
           >

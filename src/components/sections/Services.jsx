@@ -2,22 +2,22 @@ import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import SectionAnimator from '../animations/SectionAnimator';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
-import { Target, Dumbbell, Utensils } from 'lucide-react';
 
 // Optimized feature item component
 const FeatureItem = memo(({ feature, index, isHovered }) => (
   <motion.li 
     key={index} 
     className="flex items-start text-gray-300"
-    initial={{ opacity: 0.7 }}
-    animate={{ opacity: isHovered ? 1 : 0.7 }}
-    transition={{ duration: 0.2 }}
-    style={{ willChange: 'opacity' }}
+    initial={{ opacity: 0.7, x: 0 }}
+    animate={{ 
+      opacity: isHovered ? 1 : 0.7,
+      x: isHovered ? 5 : 0
+    }}
+    transition={{ delay: index * 0.05, duration: 0.2 }}
   >
     <motion.span 
-      className="text-primary mr-2"
+      className="text-primary mr-2 transition-colors"
       animate={{ color: isHovered ? '#B60D0D' : 'rgba(182, 13, 13, 0.8)' }}
-      style={{ willChange: 'color' }}
     >
       ✓
     </motion.span>
@@ -34,13 +34,7 @@ const ServiceCtaButton = memo(({ ctaText, isHovered }) => (
       backgroundColor: isHovered ? 'rgba(182, 13, 13, 0.2)' : 'rgba(182, 13, 13, 0.1)',
       borderColor: isHovered ? 'rgba(182, 13, 13, 0.3)' : 'rgba(182, 13, 13, 0.2)'
     }}
-    transition={{ duration: 0.2 }}
-    style={{ 
-      border: '1px solid',
-      willChange: 'transform, background-color, border-color',
-      backfaceVisibility: 'hidden',
-      WebkitBackfaceVisibility: 'hidden'
-    }}
+    style={{ border: '1px solid' }}
     onClick={() => {
       const packages = document.getElementById('packages');
       if (packages) {
@@ -51,8 +45,6 @@ const ServiceCtaButton = memo(({ ctaText, isHovered }) => (
     <motion.span 
       className="relative z-10 text-primary font-medium"
       animate={{ color: isHovered ? '#B60D0D' : 'rgba(182, 13, 13, 0.9)' }}
-      transition={{ duration: 0.2 }}
-      style={{ willChange: 'color' }}
     >
       {ctaText}
     </motion.span>
@@ -60,8 +52,7 @@ const ServiceCtaButton = memo(({ ctaText, isHovered }) => (
       className="absolute bottom-0 left-0 w-full h-full bg-gradient-to-r from-primary/20 to-primary/30 z-0"
       initial={{ y: '100%' }}
       animate={{ y: isHovered ? '0%' : '100%' }}
-      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
-      style={{ willChange: 'transform' }}
+      transition={{ duration: 0.3 }}
     />
   </motion.button>
 ));
@@ -78,26 +69,51 @@ const ServiceCard = memo(({ service, index, hoveredCard, setHoveredCard }) => {
     setHoveredCard(null);
   }, [setHoveredCard]);
   
+  // Memoize style objects to prevent recreation on each render
+  const cardStyle = useMemo(() => ({
+    boxShadow: isHovered ? '0 15px 30px -10px rgba(182, 13, 13, 0.15)' : 'none'
+  }), [isHovered]);
+  
+  const iconAnimation = useMemo(() => ({ 
+    backgroundColor: isHovered ? 'rgba(182, 13, 13, 0.2)' : 'rgba(182, 13, 13, 0.1)',
+    scale: isHovered ? 1.05 : 1
+  }), [isHovered]);
+  
+  const titleAnimation = useMemo(() => ({ 
+    color: isHovered ? '#ffffff' : '#f0f0f0',
+    x: isHovered ? 5 : 0
+  }), [isHovered]);
+  
+  const cornerAccentAnimation = useMemo(() => ({ 
+    opacity: isHovered ? 0.4 : 0.1,
+    scale: isHovered ? 1.2 : 1
+  }), [isHovered]);
+  
+  const cornerAccentStyle = useMemo(() => ({ 
+    background: 'radial-gradient(circle at bottom right, rgba(182, 13, 13, 0.5), transparent 70%)',
+  }), []);
+  
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, ease: "easeOut" }}
-      className="relative h-full"
+      className="relative group"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      viewport={{ once: true, margin: "-100px" }}
     >
       <motion.div
-        whileHover={{ scale: 1.02 }}
-        transition={{ duration: 0.15 }}
-        className="relative overflow-hidden rounded-xl bg-black/60 backdrop-blur-sm border border-white/10 px-10 py-8 h-full flex flex-col"
+        className="glass-card p-6 md:p-8 relative flex flex-col h-full rounded-xl overflow-hidden"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        whileHover={{ y: -8 }}
+        transition={{ duration: 0.3 }}
+        style={cardStyle}
       >
         {/* Background glow effect */}
         <motion.div 
           className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-primary/0 via-primary/20 to-primary/0 opacity-0 z-0 blur-xl"
           animate={{ opacity: isHovered ? 0.7 : 0 }}
           transition={{ duration: 0.4 }}
-          style={{ willChange: 'opacity' }}
         />
           
         {/* Card accent */}
@@ -106,47 +122,32 @@ const ServiceCard = memo(({ service, index, hoveredCard, setHoveredCard }) => {
           initial={{ scaleX: 0 }}
           animate={{ scaleX: isHovered ? 1 : 0 }}
           transition={{ duration: 0.3 }}
-          style={{ willChange: 'transform' }}
         />
         
         {/* Service Icon */}
         <div className="flex items-center gap-4 mb-5">
           <motion.div 
-            className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center text-2xl flex-shrink-0"
-            animate={{ 
-              backgroundColor: isHovered ? 'rgba(182, 13, 13, 0.2)' : 'rgba(182, 13, 13, 0.1)',
-              scale: isHovered ? 1.05 : 1
-            }}
+            className="w-16 h-16 rounded-xl bg-primary/10 flex items-center justify-center text-2xl"
+            animate={iconAnimation}
             transition={{ duration: 0.3 }}
-            style={{ willChange: 'transform, background-color' }}
           >
             {service.icon}
           </motion.div>
           
           {/* Service Header */}
           <motion.h3 
-            className="text-xl md:text-2xl font-bold text-white font-english"
-            animate={{ 
-              color: isHovered ? '#ffffff' : '#f0f0f0',
-              x: isHovered ? 5 : 0
-            }}
+            className="text-xl md:text-2xl font-bold text-white font-chakra"
+            animate={titleAnimation}
             transition={{ duration: 0.3 }}
-            style={{ willChange: 'transform, color' }}
           >
             {service.title}
           </motion.h3>
         </div>
-           
-        <motion.p 
-          className="text-gray-300 mb-6"
-          animate={{ opacity: isHovered ? 1 : 0.9 }}
-          style={{ willChange: 'opacity' }}
-        >
-          {service.description}
-        </motion.p>
+          
+
         
         {/* Features List */}
-        <ul className="space-y-2 text-sm mb-6 flex-grow">
+        <ul className="space-y-2 text-sm mb-6">
           {service.features.map((feature, featureIndex) => (
             <FeatureItem 
               key={featureIndex}
@@ -157,38 +158,84 @@ const ServiceCard = memo(({ service, index, hoveredCard, setHoveredCard }) => {
           ))}
         </ul>
         
-        {/* CTA Button */}
-        <ServiceCtaButton ctaText={service.ctaText} isHovered={isHovered} />
-        
+
         {/* Corner accent */}
         <motion.div 
           className="absolute bottom-0 right-0 w-12 h-12 z-0 opacity-20"
-          style={{ 
-            background: 'radial-gradient(circle at bottom right, rgba(182, 13, 13, 0.5), transparent 70%)',
-            willChange: 'opacity, transform'
-          }}
-          animate={{ 
-            opacity: isHovered ? 0.4 : 0.1,
-            scale: isHovered ? 1.2 : 1
-          }}
+          style={cornerAccentStyle}
+          animate={cornerAccentAnimation}
         />
       </motion.div>
     </motion.div>
   );
 });
 
+// Enhanced CTA component
+const EnhancedCta = memo(({ t }) => (
+  <motion.div 
+    className="mt-16 text-center"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: 0.4 }}
+    viewport={{ once: true, margin: "-100px" }}
+  >
+    <motion.p 
+      className="text-gray-300 mb-6 max-w-2xl mx-auto"
+      animate={{ opacity: [0.9, 1, 0.9] }}
+      transition={{ duration: 8, repeat: Infinity }}
+    >
+      {t('services.cta.looking')}
+    </motion.p>
+    <motion.div
+      className="inline-block"
+      whileHover={{ scale: 1.03 }}
+    >
+      <motion.button 
+        className="btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-lg relative overflow-hidden group"
+        whileTap={{ scale: 0.98 }}
+        onClick={() => {
+          const footer = document.getElementById('footer');
+          if (footer) {
+            footer.scrollIntoView({ behavior: 'smooth' });
+          }
+        }}
+      >
+        <span className="relative z-10">{t('contact.title')}</span>
+        <motion.svg 
+          className="w-5 h-5 relative z-10"
+          width="18" 
+          height="18" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          xmlns="http://www.w3.org/2000/svg"
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
+        >
+          <path d="M14 5L21 12M21 12L14 19M21 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        </motion.svg>
+        <motion.span 
+          className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 opacity-80 z-0" 
+          initial={{ scale: 0, opacity: 0 }}
+          whileHover={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        />
+      </motion.button>
+    </motion.div>
+  </motion.div>
+));
+
 // Main Services component - optimized with memoization
 const Services = memo(() => {
-  const { t } = useLanguage();
   const [hoveredCard, setHoveredCard] = useState(null);
-  const setHoveredCardCallback = useCallback((id) => setHoveredCard(id), []);
+  const { t } = useLanguage();
 
+  // Memoize services array to prevent recreation on re-renders
   const services = useMemo(() => [
     {
       id: 1,
       title: t('services.diet.title'),
       description: t('services.diet.description'),
-      icon: <Utensils className="w-8 h-8 text-primary" />,
+      icon: "🥗",
       ctaText: t('services.cta.view'),
       features: [
         t('services.diet.feature.1'),
@@ -200,7 +247,7 @@ const Services = memo(() => {
       id: 2,
       title: t('services.workout.title'),
       description: t('services.workout.description'),
-      icon: <Dumbbell className="w-8 h-8 text-primary" />,
+      icon: "💪",
       ctaText: t('services.cta.view'),
       features: [
         t('services.workout.feature.1'),
@@ -212,7 +259,7 @@ const Services = memo(() => {
       id: 3,
       title: t('services.tools.title'),
       description: t('services.tools.description'),
-      icon: <Target className="w-8 h-8 text-primary" />,
+      icon: "🎯",
       ctaText: t('services.cta.view'),
       features: [
         t('services.tools.feature.1'),
@@ -223,6 +270,11 @@ const Services = memo(() => {
     }
   ], [t]);
   
+  // Optimization: Use a callback for hover state changes
+  const setHoveredCardCallback = useCallback((id) => {
+    setHoveredCard(id);
+  }, []);
+  
   return (
     <SectionAnimator 
       id="services"
@@ -231,61 +283,19 @@ const Services = memo(() => {
       subtitle={t('services.subtitle')}
       showPatterns={true}
     >
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
-          {services.map((service, index) => (
-            <ServiceCard 
-              key={service.id}
-              service={service}
-              index={index}
-              hoveredCard={hoveredCard}
-              setHoveredCard={setHoveredCardCallback}
-            />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        {services.map((service, index) => (
+          <ServiceCard 
+            key={service.id}
+            service={service}
+            index={index}
+            hoveredCard={hoveredCard}
+            setHoveredCard={setHoveredCardCallback}
+          />
+        ))}
       </div>
       
-      {/* Enhanced CTA */}
-      <div className="mt-10 sm:mt-12 md:mt-16 text-center">
-        <p className="text-gray-300 mb-4 sm:mb-6 max-w-2xl mx-auto px-4">
-          {t('services.cta.looking')}
-        </p>
-        <motion.div
-          className="inline-block"
-          whileHover={{ scale: 1.02 }}
-          style={{ 
-            willChange: 'transform',
-            backfaceVisibility: 'hidden',
-            WebkitBackfaceVisibility: 'hidden',
-            touchAction: 'pan-y pinch-zoom'
-          }}
-        >
-          <motion.a
-            href="#packages"
-            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary-hover text-white text-base sm:text-lg font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
-            whileHover={{ scale: 1.02, backgroundColor: "#950B0B" }}
-            whileTap={{ scale: 0.98 }}
-            style={{ 
-              willChange: 'transform, background-color',
-              backfaceVisibility: 'hidden',
-              WebkitBackfaceVisibility: 'hidden',
-              touchAction: 'pan-y pinch-zoom'
-            }}
-            onClick={(e) => {
-              e.preventDefault();
-              const packages = document.getElementById('packages');
-              if (packages) {
-                packages.scrollIntoView({ behavior: 'smooth' });
-              }
-            }}
-          >
-            <span className="font-bold tracking-wide">{t('packages.title')}</span>
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </motion.a>
-        </motion.div>
-      </div>
+
     </SectionAnimator>
   );
 });
