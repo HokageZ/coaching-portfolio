@@ -1,0 +1,22 @@
+Favicon Implementation Notes:
+
+1. SVG Favicon (favicon.svg):
+   - Contains "DR FARES COACHING" logo styling
+   - Uses path elements for cross-browser compatibility
+   - Has the brand colors (#B71C1C for primary red and #171717 for background)
+   - Stacked layout with "DR" (in red) and "FARES" (in white) at the top, and "COACHING" (in white) at the bottom
+   - Divider line between main text and "COACHING"
+
+2. The favicon needs to be optimized further for:
+   - Creating a PNG version (favicon.png) - This can be done by rendering the SVG and exporting it as PNG
+   - Creating various sizes for different platforms:
+     * apple-touch-icon.png (180x180px)
+     * favicon-32x32.png
+     * favicon-16x16.png
+
+3. Implementation in index.html:
+   - Added SVG favicon link
+   - Added PNG fallback for browsers that don't support SVG favicons
+   - Added apple-touch-icon for iOS devices
+
+Note: For a production site, consider generating a complete set of favicon files using a tool like https://realfavicongenerator.net and placing them in the public directory. 

@@ -1,0 +1,645 @@
+/* Mobile Optimizations CSS */
+
+/* Mobile touch optimizations */
+@media (max-width: 768px) {
+  /* Improve tap targets */
+  button, 
+  a,
+  .interactive-element {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Add space between interactive elements */
+  .mobile-spaced > * {
+    margin-bottom: 16px;
+  }
+  
+  /* Increase font size for better readability */
+  body {
+    font-size: 16px;
+  }
+  
+  /* Reduce animations for better performance */
+  .reduce-motion {
+    transition-duration: 0.2s !important;
+    animation-duration: 0.2s !important;
+  }
+  
+  /* Fix for fixed position elements on iOS */
+  .ios-fixed {
+    position: fixed;
+    width: 100%;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+  
+  /* Fix for smooth scrolling on iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Improve contrast for better readability */
+  .mobile-contrast {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Font-size adjustments for headings */
+  h1 {
+    font-size: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  h2 {
+    font-size: 1.75rem !important;
+    margin-bottom: 0.875rem !important;
+  }
+  
+  h3 {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.75rem !important;
+  }
+  
+  /* Avoid text getting too small */
+  .text-xs {
+    font-size: 0.875rem !important;
+  }
+  
+  /* Improve image loading performance */
+  img {
+    content-visibility: auto;
+  }
+  
+  /* Override any fixed elements that might cause issues */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Default max-width for content */
+  .container {
+    width: 100%;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Improved section spacing */
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Content padding adjustments */
+  .content-padding {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  /* Component spacing */
+  .text-center.mb-12 {
+    margin-bottom: 2rem !important;
+  }
+
+  .text-center.mb-16 {
+    margin-bottom: 2.5rem !important;
+  }
+
+  /* Card and grid spacing */
+  .grid {
+    gap: 1.5rem !important;
+  }
+
+  .glass-card {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* List spacing */
+  .space-y-2 > * + * {
+    margin-top: 0.75rem !important;
+  }
+
+  .space-y-3 > * + * {
+    margin-top: 1rem !important;
+  }
+
+  .space-y-4 > * + * {
+    margin-top: 1.25rem !important;
+  }
+
+  /* Button spacing */
+  .btn-primary,
+  .btn-outline {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Form element spacing */
+  input,
+  select,
+  textarea {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Image spacing */
+  .aspect-w-4 {
+    margin-bottom: 1.5rem !important;
+  }
+
+  /* Improved tap targets */
+  .nav-item {
+    @apply w-full py-4 px-6;
+    touch-action: manipulation;
+  }
+  
+  /* Enhanced mobile menu backdrop */
+  .mobile-menu {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.95));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Smooth transitions */
+  .mobile-menu-enter {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  
+  .mobile-menu-enter-active {
+    transform: translateX(0%);
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  }
+  
+  .mobile-menu-exit {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+  
+  .mobile-menu-exit-active {
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  }
+  
+  /* Premium active state indicator */
+  .nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--color-primary), var(--color-primary-dark));
+    border-radius: 0 2px 2px 0;
+    opacity: 0.8;
+  }
+  
+  /* Enhanced touch feedback */
+  .nav-item:active {
+    transform: scale(0.98);
+    transition: transform 0.2s ease;
+  }
+  
+  /* Improved spacing and typography */
+  .nav-menu {
+    padding: 1.5rem 0;
+  }
+  
+  .nav-item {
+    font-size: 1.125rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+  
+  /* Premium dividers */
+  .nav-divider {
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+    margin: 1rem 0;
+  }
+  
+  /* Enhanced focus states */
+  .nav-item:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-primary);
+    border-radius: 8px;
+  }
+  
+  /* Smooth scroll behavior */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Adjust based on your header height */
+  }
+  
+  /* Fix for iOS momentum scrolling */
+  .mobile-menu-content {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Prevent background scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+  }
+  
+  /* Enhanced button states */
+  .menu-button {
+    @apply w-10 h-10 flex items-center justify-center;
+    touch-action: manipulation;
+  }
+  
+  .menu-button:active {
+    transform: scale(0.95);
+  }
+  
+  /* Premium hamburger animation */
+  .hamburger-line {
+    @apply h-0.5 bg-white transition-all duration-300;
+    transform-origin: center;
+  }
+  
+  .menu-open .hamburger-line:first-child {
+    transform: translateY(6px) rotate(45deg);
+  }
+  
+  .menu-open .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .menu-open .hamburger-line:last-child {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+  
+  /* Enhanced language switcher */
+  .language-toggle {
+    @apply w-full flex items-center justify-between px-6 py-4;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.05), transparent);
+    border-radius: 8px;
+  }
+  
+  .language-toggle:active {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.08), transparent);
+  }
+}
+
+/* Better handling of touch events */
+@media (hover: none) {
+  .hover-scale:hover {
+    transform: none !important;
+  }
+  
+  .hover-effect:hover {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  /* Active states for touch devices */
+  .hover-scale:active,
+  .hover-effect:active {
+    transform: scale(0.98) !important;
+    transition: transform 0.1s ease !important;
+  }
+}
+
+/* Modern Mobile Optimizations */
+
+/* Base mobile settings */
+@media (max-width: 768px) {
+  html {
+    font-size: 14px; /* Slightly smaller base font for mobile */
+  }
+  
+  h1, .h1 {
+    font-size: 2.5rem !important;
+    line-height: 1.2 !important;
+  }
+  
+  h2, .h2 {
+    font-size: 2rem !important;
+    line-height: 1.3 !important;
+  }
+  
+  h3, .h3 {
+    font-size: 1.5rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  p {
+    line-height: 1.6 !important;
+  }
+  
+  /* Improve tap targets */
+  button, a, 
+  input[type="button"], 
+  input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.75rem 1.25rem;
+  }
+  
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  
+  /* Enhanced spacing for mobile */
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+  
+  /* Better section spacing */
+  section {
+    padding-top: 4rem !important;
+    padding-bottom: 4rem !important;
+  }
+  
+  /* Improve mobile card layouts */
+  .glass-card {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Small mobile optimizations */
+@media (max-width: 480px) {
+  html {
+    font-size: 13px;
+  }
+  
+  /* Optimize buttons for small screens */
+  .btn-primary, .btn-outline {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  /* Stacked layout for mobile forms */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  /* Better spacing for small screens */
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+  
+  /* Optimize section headers */
+  .text-center h2 {
+    font-size: 1.75rem !important;
+  }
+  
+  .text-center p {
+    font-size: 1rem !important;
+  }
+}
+
+/* Enhanced motion preferences support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable parallax and background animations */
+  .parallax-pattern,
+  .bg-gradient-radial {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .mobile-menu,
+  .nav-item,
+  .hamburger-line {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Dark mode optimizations */
+@media (prefers-color-scheme: dark) {
+  /* Adjust contrast for better readability */
+  .text-gray-300 {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+  
+  .text-gray-400 {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+  
+  /* Improve dark mode focus states */
+  *:focus-visible {
+    outline: 2px solid rgba(182, 13, 13, 0.7) !important;
+    outline-offset: 2px !important;
+  }
+}
+
+/* Better touch interactions */
+@media (hover: none) and (pointer: coarse) {
+  /* Optimize hover states for touch devices */
+  .hover-underline::after {
+    display: none;
+  }
+  
+  a:active, button:active {
+    opacity: 0.7;
+  }
+  
+  /* Larger touch targets */
+  nav a, 
+  nav button {
+    padding: 0.75rem 1rem !important;
+    margin: 0.25rem 0 !important;
+  }
+  
+  /* Improve swipeable areas */
+  .swipeable {
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+}
+
+/* Device-specific optimizations */
+/* iPhone notch optimization */
+@supports (padding: max(0px)) {
+  .safe-area-inset-top {
+    padding-top: max(1.5rem, env(safe-area-inset-top)) !important;
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom)) !important;
+  }
+  
+  .safe-area-inset-left {
+    padding-left: max(1.25rem, env(safe-area-inset-left)) !important;
+  }
+  
+  .safe-area-inset-right {
+    padding-right: max(1.25rem, env(safe-area-inset-right)) !important;
+  }
+}
+
+/* High DPI screen optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Optimize borders for retina */
+  .glass-card,
+  .border,
+  .border-t,
+  .border-b,
+  .border-l,
+  .border-r {
+    border-width: 0.5px !important;
+  }
+}
+
+/* Mobile-first animation optimizations */
+@media (max-width: 768px) {
+  /* Simplified animations for mobile */
+  .glass-card:hover,
+  .btn-primary:hover,
+  .btn-outline:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* Fix for mobile sticky elements */
+  .sticky-mobile {
+    position: sticky !important;
+    top: 0;
+    z-index: 30;
+    background-color: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(8px);
+  }
+  
+  /* Better scroll behavior */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 896px) and (orientation: landscape) {
+  section {
+    padding-top: 2.5rem !important;
+    padding-bottom: 2.5rem !important;
+  }
+  
+  body {
+    overflow-x: hidden;
+  }
+  
+  .h-screen {
+    height: auto !important;
+    min-height: 100vh;
+  }
+}
+
+/* Mobile Typography Optimizations */
+@media screen and (max-width: 768px) {
+  /* Base text adjustments */
+  body {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-normal);
+  }
+
+  /* Heading Adjustments */
+  h1, .h1 {
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-tight);
+  }
+
+  h2, .h2 {
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-snug);
+  }
+
+  h3, .h3 {
+    font-size: var(--font-size-2xl);
+    line-height: var(--line-height-normal);
+  }
+
+  h4, .h4 {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-normal);
+  }
+
+  /* Paragraph text */
+  p {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+  }
+
+  /* Small text */
+  .text-sm {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+  }
+
+  /* Navigation and UI elements */
+  .nav-link {
+    font-size: var(--font-size-base);
+  }
+
+  .button {
+    font-size: var(--font-size-base);
+  }
+
+  /* Section headers */
+  .section-title {
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .section-subtitle {
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-normal);
+  }
+
+  /* Card and component text */
+  .card-title {
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-snug);
+  }
+
+  .card-body {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-relaxed);
+  }
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu,
+  .nav-item,
+  .hamburger-line {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* iOS Safe Areas */
+@supports (padding: max(0px)) {
+  .mobile-menu {
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: more) {
+  .nav-item {
+    @apply text-white border border-white/20;
+  }
+  
+  .nav-item.active {
+    @apply bg-primary border-primary;
+  }
+} 
