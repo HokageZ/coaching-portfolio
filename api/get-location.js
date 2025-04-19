@@ -1,5 +1,6 @@
 // api/get-location.js
 
+// This format works with Vercel serverless functions
 export default async function handler(request, response) {
   try {
     // Read the country code from the Vercel-provided header
