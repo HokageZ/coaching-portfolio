@@ -4,10 +4,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext'; // Adjust path as needed
 import SectionAnimator from '../animations/SectionAnimator'; // Adjust path as needed
+import pricesData from '../../data/prices.json';
 
 // --- PackageCard Component ---
 // Renders a single package card UI based on props received from Packages component
-const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPrice, userLocation, exchangeRate, userCurrency }) => {
+const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPrice, userLocation, userCurrency }) => {
 
   // Handler for duration dropdown change
   const handleDurationChange = (e) => {
@@ -20,7 +21,7 @@ const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPri
   const getButtonText = (tierName) => {
     // Determine which tier's prices to use based on the name
     const tierData = pkg.tiers.find(tData => tData.name === tierName) || pkg.tiers[0]; // Fallback to first tier
-    const priceInfo = formatPrice(tierData.price, tierData.priceUSD);
+    const priceInfo = formatPrice(pkg.type, tierData.type);
 
     if (language === 'ar') {
       return tierName === t('packages.silver')
@@ -36,7 +37,7 @@ const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPri
   const getWhatsAppMessage = (tierName) => {
     // Determine which tier's prices to use
     const tierData = pkg.tiers.find(tData => tData.name === tierName) || pkg.tiers[0]; // Fallback
-    const priceInfo = formatPrice(tierData.price, tierData.priceUSD);
+    const priceInfo = formatPrice(pkg.type, tierData.type);
 
     return `https://wa.me/201099488562?text=${encodeURIComponent(
       t('whatsapp.package') // Assumes 'whatsapp.package' translation exists (e.g., "I'm interested in the {0} package - {1}")
@@ -182,7 +183,7 @@ const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPri
           <div className="grid grid-cols-1 gap-4 mb-2">
             {pkg.tiers.map((tier, idx) => {
               // Format price specifically for this tier rendering
-              const priceInfo = formatPrice(tier.price, tier.priceUSD);
+              const priceInfo = formatPrice(pkg.type, tier.type);
               return (
               <motion.div
                 key={idx}
@@ -270,168 +271,107 @@ const PackageCard = ({ pkg, t, language, allPackages, onPackageChange, formatPri
 // Manages fetching location/currency, selecting package, and rendering the PackageCard
 const Packages = () => {
   // State variables
-  const [selectedPackage, setSelectedPackage] = useState(null); // Holds the currently displayed package object
-  const [userLocation, setUserLocation] = useState(null); // Holds country code ('EG', 'SA', 'INTL', etc.) or null initially
-  const [exchangeRate, setExchangeRate] = useState(1); // USD to userCurrency rate
-  const [userCurrency, setUserCurrency] = useState('USD'); // Currency code ('EGP', 'SAR', 'USD', etc.)
-  const [isLoadingLocation, setIsLoadingLocation] = useState(true); // Loading state for location/currency fetch
+  const [selectedPackage, setSelectedPackage] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [userCurrency, setUserCurrency] = useState('USD');
+  const [isLoadingLocation, setIsLoadingLocation] = useState(true);
 
   // Language context
   const { t, language } = useLanguage();
 
-  // Memoized package data (recalculates only if 't' function changes)
+  // Memoized package data
   const packages = useMemo(() => [
     {
       title: t('packages.testing.title'),
       duration: t('packages.testing.duration'),
+      type: 'testing', // Add type to match prices.json structure
       tiers: [
-        { name: t('packages.silver'), price: "600", priceUSD: "45", benefits: [ t('packages.silver.benefit.1'), t('packages.silver.benefit.2') ] },
-        { name: t('packages.gold'), price: "1200", priceUSD: "90", benefits: [ t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3') ] }
+        { name: t('packages.silver'), type: 'silver', benefits: [t('packages.silver.benefit.1'), t('packages.silver.benefit.2')] },
+        { name: t('packages.gold'), type: 'gold', benefits: [t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3')] }
       ],
-      features: [ t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10') ],
-      suitableFor: t('packages.testing.suitableFor'), highlighted: false
+      features: [t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10')],
+      suitableFor: t('packages.testing.suitableFor'),
+      highlighted: false
     },
     {
       title: t('packages.development.title'),
       duration: t('packages.development.duration'),
+      type: 'development',
       tiers: [
-        { name: t('packages.silver'), price: "1000", priceUSD: "70", benefits: [ t('packages.silver.benefit.1'), t('packages.silver.benefit.2') ] },
-        { name: t('packages.gold'), price: "2000", priceUSD: "140", benefits: [ t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3') ] }
+        { name: t('packages.silver'), type: 'silver', benefits: [t('packages.silver.benefit.1'), t('packages.silver.benefit.2')] },
+        { name: t('packages.gold'), type: 'gold', benefits: [t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3')] }
       ],
-      features: [ t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10') ],
-      suitableFor: t('packages.development.suitableFor'), highlighted: true
+      features: [t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10')],
+      suitableFor: t('packages.development.suitableFor'),
+      highlighted: true
     },
     {
       title: t('packages.journey.title'),
       duration: t('packages.journey.duration'),
+      type: 'journey',
       tiers: [
-        { name: t('packages.silver'), price: "1600", priceUSD: "100", benefits: [ t('packages.silver.benefit.1'), t('packages.silver.benefit.2') ] },
-        { name: t('packages.gold'), price: "3200", priceUSD: "200", benefits: [ t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3') ] }
+        { name: t('packages.silver'), type: 'silver', benefits: [t('packages.silver.benefit.1'), t('packages.silver.benefit.2')] },
+        { name: t('packages.gold'), type: 'gold', benefits: [t('packages.gold.benefit.1'), t('packages.gold.benefit.2'), t('packages.gold.benefit.3')] }
       ],
-      features: [ t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10') ],
-      suitableFor: t('packages.journey.suitableFor'), highlighted: false
+      features: [t('packages.feature.1'), t('packages.feature.2'), t('packages.feature.3'), t('packages.feature.4'), t('packages.feature.5'), t('packages.feature.6'), t('packages.feature.7'), t('packages.feature.8'), t('packages.feature.9'), t('packages.feature.10')],
+      suitableFor: t('packages.journey.suitableFor'),
+      highlighted: false
     }
   ], [t]);
 
-  // Effect to fetch user location and exchange rates ONCE on component mount
+  // Effect to fetch user location ONCE on component mount
   useEffect(() => {
-    const fetchUserLocationAndRates = async () => {
-      setIsLoadingLocation(true); // Indicate loading start
-      let determinedCountryCode = 'INTL'; // Default to international
-
+    const fetchUserLocation = async () => {
+      setIsLoadingLocation(true);
       try {
-        // --- 1. Fetch Country Code using Vercel API Route ---
-        console.log(`Workspaceing location from /api/get-location`);
         const response = await fetch('/api/get-location');
-
         if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`API route HTTP error! status: ${response.status}, body: ${errorBody}`);
+          throw new Error(`API route HTTP error! status: ${response.status}`);
         }
-
         const data = await response.json();
-        console.log('Location API route response:', data);
-
-        if (data && data.country_code) {
-            determinedCountryCode = data.country_code; // Use code from Vercel header
-        } else {
-            console.warn("Received invalid data from API route, using default 'INTL'.");
-            determinedCountryCode = 'INTL'; // Fallback if API route response is bad
-        }
-
-      } catch (error) {
-        // --- Handle errors fetching from /api/get-location (e.g., dev environment) ---
-        console.warn('Fetching from /api/get-location failed, using fallback:', error.message);
-        // In a real dev scenario, might still want a fallback (e.g., based on language)
-        // For simplicity here, we stick to 'INTL' as the ultimate fallback on error.
-        determinedCountryCode = 'INTL';
-      }
-
-      // --- 2. Set User Location State ---
-      setUserLocation(determinedCountryCode);
-      console.log(`User location determined as: ${determinedCountryCode}`);
-
-      // --- 3. Fetch Exchange Rates (if necessary) based on determined location ---
-      try {
-        const arabCountries = {
-            'EG': 'EGP', 'SA': 'SAR', 'AE': 'AED', 'KW': 'KWD', 'QA': 'QAR',
-            'BH': 'BHD', 'OM': 'OMR', 'JO': 'JOD', 'LB': 'LBP', 'IQ': 'IQD',
-            'SY': 'SYP', 'YE': 'YER', 'PS': 'ILS', 'MA': 'MAD', 'DZ': 'DZD',
-            'TN': 'TND', 'LY': 'LYD', 'SD': 'SDG', 'SO': 'SOS', 'DJ': 'DJF',
-            'MR': 'MRO'
-            // Add any other countries/currencies needed
+        
+        // Define supported currencies and their corresponding countries
+        const countryCurrencyMap = {
+          'EG': 'EGP',
+          'SA': 'SAR',
+          'AE': 'AED',
+          'KW': 'KWD',
+          'QA': 'QAR',
+          'BH': 'BHD',
+          'OM': 'OMR'
         };
 
-        if (determinedCountryCode === 'EG') {
-          // Handle Egypt: Use EGP, no exchange rate fetch needed
-          setExchangeRate(1);
-          setUserCurrency('EGP');
-          console.log('User is in Egypt (EG), setting currency to EGP.');
-
-        } else if (arabCountries[determinedCountryCode]) {
-          // Handle other specified Arab countries: Fetch exchange rate
-          const targetCurrency = arabCountries[determinedCountryCode];
-          console.log(`Workspaceing exchange rates for ${targetCurrency} (${determinedCountryCode})...`);
-
-          // !! IMPORTANT: Exchange Rate API !!
-          // - Check API provider's terms, limits, and key requirements.
-          // - Store API keys securely (Vercel Environment Variables).
-          // - Consider adding more robust error handling for this specific fetch.
-          const currencyApiUrl = `https://api.exchangerate-api.com/v4/latest/USD`; // Using v4 example
-          const currencyResponse = await fetch(currencyApiUrl);
-
-          if (!currencyResponse.ok) {
-            throw new Error(`Currency API HTTP error! Status: ${currencyResponse.status}`);
-          }
-          const currencyData = await currencyResponse.json();
-          if (!currencyData || !currencyData.rates) {
-            throw new Error('Invalid data received from currency API');
-          }
-
-          const rate = currencyData.rates[targetCurrency];
-          if (rate) {
-            setExchangeRate(rate);
-            setUserCurrency(targetCurrency);
-            console.log(`Exchange rate set for ${targetCurrency}: ${rate}`);
-          } else {
-            // If rate for specific currency not found, fallback to USD
-            console.warn(`Rate for ${targetCurrency} not found in API response, falling back to USD.`);
-            setExchangeRate(1);
-            setUserCurrency('USD');
-          }
+        // Set currency based on country code
+        if (data && data.country_code) {
+          const currency = countryCurrencyMap[data.country_code] || 'USD';
+          setUserLocation(data.country_code);
+          setUserCurrency(currency);
         } else {
-          // Default to USD for all other countries or 'INTL'
-          setExchangeRate(1);
+          setUserLocation('INTL');
           setUserCurrency('USD');
-          console.log(`Location (${determinedCountryCode}) not Egypt or specified Arab country, using USD.`);
         }
-      } catch (exchangeError) {
-          // Handle errors during the exchange rate fetching process
-          console.error("Error fetching or processing exchange rates:", exchangeError);
-          console.warn("Falling back to USD due to exchange rate fetch/processing error.");
-          setExchangeRate(1); // Fallback to USD on error
-          setUserCurrency('USD');
+      } catch (error) {
+        console.warn('Error fetching location:', error);
+        setUserLocation('INTL');
+        setUserCurrency('USD');
       } finally {
-           // --- 4. Finish Loading ---
-           setIsLoadingLocation(false); // Stop loading indicator
+        setIsLoadingLocation(false);
       }
     };
 
-    fetchUserLocationAndRates();
-  }, []); // Empty dependency array means this runs only once when the component mounts
+    fetchUserLocation();
+  }, []);
 
-  // Effect to set the initially selected package (runs after packages/language potentially update)
+  // Effect to set initial package
   useEffect(() => {
-    // Set the "Development" package (index 1) as default/initial
     if (packages && packages.length > 1) {
-        setSelectedPackage(packages[1]);
+      setSelectedPackage(packages[1]);
     } else if (packages && packages.length > 0) {
-        setSelectedPackage(packages[0]); // Fallback to first package if less than 2
+      setSelectedPackage(packages[0]);
     }
-  }, [packages, language]); // Recalculate if packages data or language changes
+  }, [packages, language]);
 
-
-  // Handler to change the displayed package based on duration selection in PackageCard
+  // Handler for package changes
   const handlePackageChange = (duration) => {
     const newPkg = packages.find(p => p.duration === duration);
     if (newPkg) {
@@ -439,44 +379,33 @@ const Packages = () => {
     }
   };
 
-  // Function to format price based on location, rate, and currency
-  // Memoized with useCallback to prevent unnecessary re-renders of PackageCard if props haven't changed
-  const formatPrice = useCallback((priceEGP, priceUSD) => {
-    // Default return value
-    let calculatedPrice = '...'; // Show loading indicator initially
-    let displayCurrency = '';
-
-    // Only calculate prices once location/currency info is loaded
-    if (!isLoadingLocation) {
-        if (userLocation === 'EG' && priceEGP) {
-            // Use local EGP price if location is Egypt
-            calculatedPrice = priceEGP; // Assuming priceEGP is already formatted string
-            displayCurrency = t('packages.egp') || 'EGP'; // Use translation or fallback
-        } else if (userCurrency !== 'USD' && priceUSD && exchangeRate) {
-            // Convert USD to local currency if applicable and rate is available
-            // Format to integer (no decimals), adjust .toFixed() if needed
-            calculatedPrice = (parseFloat(priceUSD) * exchangeRate).toFixed(0);
-            const currencyTranslationKey = `packages.${userCurrency.toLowerCase()}`; // e.g., 'packages.sar'
-            const translatedSymbol = t(currencyTranslationKey);
-            // Use translated symbol if translation exists, otherwise use the code
-            displayCurrency = translatedSymbol !== currencyTranslationKey ? translatedSymbol : userCurrency;
-        } else if (priceUSD) {
-            // Default to USD price if no other condition met (includes INTL location)
-            calculatedPrice = parseFloat(priceUSD).toFixed(0); // Format USD price as integer
-            displayCurrency = t('packages.usd') || 'USD'; // Use translation or fallback
-        } else {
-             calculatedPrice = 'N/A'; // Case where priceUSD is missing
-             displayCurrency = '';
-        }
+  // Format price using the JSON data
+  const formatPrice = useCallback((packageType, tierType) => {
+    if (isLoadingLocation) {
+      return { price: '...', currency: '' };
     }
 
-    return {
-      price: calculatedPrice,
-      currency: displayCurrency
-    };
-  // Dependencies for useCallback ensure the function instance updates only if these values change
-  }, [userLocation, userCurrency, exchangeRate, t, isLoadingLocation]);
+    try {
+      // Get price from JSON data
+      const price = pricesData[packageType][tierType][userCurrency];
+      const currencyTranslationKey = `packages.${userCurrency.toLowerCase()}`;
+      const translatedSymbol = t(currencyTranslationKey);
+      const displayCurrency = translatedSymbol !== currencyTranslationKey ? translatedSymbol : userCurrency;
 
+      return {
+        price: price.toString(),
+        currency: displayCurrency
+      };
+    } catch (error) {
+      console.error('Error formatting price:', error);
+      // Fallback to USD price
+      const fallbackPrice = pricesData[packageType][tierType]['USD'];
+      return {
+        price: fallbackPrice.toString(),
+        currency: 'USD'
+      };
+    }
+  }, [userCurrency, t, isLoadingLocation]);
 
   // --- Main Component JSX ---
   return (
@@ -522,10 +451,8 @@ const Packages = () => {
                     language={language}
                     allPackages={packages}
                     onPackageChange={handlePackageChange}
-                    formatPrice={formatPrice} // Pass down the memoized formatPrice function
-                    // Pass down relevant state needed by PackageCard for display/logic
+                    formatPrice={formatPrice}
                     userLocation={userLocation}
-                    exchangeRate={exchangeRate}
                     userCurrency={userCurrency}
                   />
                 </motion.div>

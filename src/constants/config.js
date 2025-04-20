@@ -59,51 +59,6 @@ export const SERVICES = [
   }
 ];
 
-export const PACKAGES = [
-  {
-    title: "Starter",
-    price: "$99",
-    period: "per month",
-    features: [
-      "2 one-on-one sessions per month",
-      "Email support",
-      "Basic goal setting",
-      "Progress tracking",
-      "Access to online resources"
-    ],
-    highlighted: false
-  },
-  {
-    title: "Professional",
-    price: "$199",
-    period: "per month",
-    features: [
-      "4 one-on-one sessions per month",
-      "Priority email & chat support",
-      "Advanced goal setting",
-      "Weekly progress reports",
-      "Access to all online resources",
-      "Group workshop access"
-    ],
-    highlighted: true
-  },
-  {
-    title: "Elite",
-    price: "$299",
-    period: "per month",
-    features: [
-      "8 one-on-one sessions per month",
-      "24/7 priority support",
-      "Customized action plans",
-      "Daily progress tracking",
-      "Access to all resources",
-      "All group workshops",
-      "1-on-1 strategy sessions"
-    ],
-    highlighted: false
-  }
-];
-
 export const FAQS = [
   {
     question: "مين يقدر ينضم للبرنامج؟",

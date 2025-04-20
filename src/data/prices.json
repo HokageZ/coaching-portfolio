@@ -1,0 +1,68 @@
+{
+  "testing": {
+    "silver": {
+      "EGP": 599,
+      "USD": 39,
+      "SAR": 169,
+      "AED": 159,
+      "KWD": 14,
+      "QAR": 159,
+      "BHD": 17,
+      "OMR": 17
+    },
+    "gold": {
+      "EGP": 1199,
+      "USD": 89,
+      "SAR": 339,
+      "AED": 329,
+      "KWD": 29,
+      "QAR": 299,
+      "BHD": 33,
+      "OMR": 33
+    }
+  },
+  "development": {
+    "silver": {
+      "EGP": 999,
+      "USD": 69,
+      "SAR": 259,
+      "AED": 249,
+      "KWD": 22,
+      "QAR": 249,
+      "BHD": 29,
+      "OMR": 29
+    },
+    "gold": {
+      "EGP": 1999,
+      "USD": 139,
+      "SAR": 519,
+      "AED": 509,
+      "KWD": 44,
+      "QAR": 499,
+      "BHD": 49,
+      "OMR": 49
+    }
+  },
+  "journey": {
+    "silver": {
+      "EGP": 1599,
+      "USD": 99,
+      "SAR": 369,
+      "AED": 369,
+      "KWD": 29,
+      "QAR": 359,
+      "BHD": 39,
+      "OMR": 39
+    },
+    "gold": {
+      "EGP": 3199,
+      "USD": 199,
+      "SAR": 749,
+      "AED": 699,
+      "KWD": 59,
+      "QAR": 699,
+      "BHD": 77,
+      "OMR": 77
+    }
+  }
+} 
